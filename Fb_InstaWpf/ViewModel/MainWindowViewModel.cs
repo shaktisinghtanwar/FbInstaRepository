@@ -980,9 +980,28 @@ namespace Fb_InstaWpf.ViewModel
         private void BindUserInfo()
         {
             //BindUserInfoByApi();
-            UserListInfo.Add(new FbpageInboxUserInfo { InboxUserName = "rahul baba" });
-            UserListInfo.Add(new FbpageInboxUserInfo { InboxUserName = "YoYO baba" });
-            UserListInfo.Add(new FbpageInboxUserInfo { InboxUserName = "Tiger baba" });
+            //UserListInfo.Add(new FbpageInboxUserInfo { InboxUserName = "rahul baba" });
+            //UserListInfo.Add(new FbpageInboxUserInfo { InboxUserName = "YoYO baba" });
+            //UserListInfo.Add(new FbpageInboxUserInfo { InboxUserName = "Tiger baba" });
+
+
+            string query = "select M_InboxUserId,PlateformType,PostType,Message,ImgSource from TblJob";
+            var dt = sql.GetDataTable(query);
+            foreach (DataRow item in dt.Rows)
+            {
+
+                string inboxUserId = Convert.ToString(item["M_InboxUserId"]);
+                string PlateformType = Convert.ToString(item["PlateformType"]);
+                string PostType = Convert.ToString(item["PostType"]);
+                string Message = Convert.ToString(item["Message"]);
+                string ImgSource = Convert.ToString(item["ImgSource"]);
+                MessagingListInfo.Add(new FbUserMessageInfo { UserType = 0, Message = Message });
+                  
+             
+            }
+
+
+
 
         }
 
@@ -994,7 +1013,15 @@ namespace Fb_InstaWpf.ViewModel
             {
                 UserMessengerTabItemList.Add(new UserMsgTabItem() { Header = fbpageInboxUserInfo.InboxUserName, MessagingListInfo = MessagingListInfo });
                //printer.Start();
-                GetUserChatBoxHistory();
+                if (isLoggedIn)
+                {
+                    GetUserChatBoxHistory();
+                }
+                else
+                {
+                    BindUserInfo();
+                }
+                
             }
 
 
@@ -1082,6 +1109,7 @@ namespace Fb_InstaWpf.ViewModel
                 {
                     string otheruser = selectSingleNode.InnerText;
                     MessagingListInfo.Add(new FbUserMessageInfo { UserType = 0, Message = otheruser });
+
 
                 }
 
