@@ -18,6 +18,8 @@ using System.Windows;
 using HtmlDocument = HtmlAgilityPack.HtmlDocument;
 using Keys = OpenQA.Selenium.Keys;
 using Microsoft.Win32;
+using System.Threading.Tasks;
+using System.Windows.Threading;
 
 namespace Fb_InstaWpf.ViewModel
 {
@@ -41,11 +43,25 @@ namespace Fb_InstaWpf.ViewModel
         public DelegateCommand cmbUserLoaded { get; set; }
         public DelegateCommand ImageProgressBarLoaded { get; set; }
 
+
+        public ObservableCollection<FacebookUserLoginInfo> LoginUsersList
+        {
+            get { return _loginUsersList; }
+            set { _loginUsersList = value; OnPropertyChanged(); }
+        }
+
+
+        public FacebookUserLoginInfo SelectedMainUser
+        {
+            get => _selectedMainUser;
+            set { _selectedMainUser = value; OnPropertyChanged(); }
+        }
         #endregion
-        
-        private System.Timers.Timer timer;
-        private System.Timers.Timer fbTimer;
-        private System.Timers.Timer InstaTimer;
+
+        DbHelper _dbHelper;
+        OnlineFetcher _onlineFetcher;
+        OnlinePoster _onlinePoster;
+      
         //Thread printer;
 
         #region Contructor
@@ -53,19 +69,17 @@ namespace Fb_InstaWpf.ViewModel
         {
             UserMessengerTabItemList = new ObservableCollection<UserMsgTabItem>();
             UserMsgTabItemListFb = new ObservableCollection<UserMsgTabItem>();
-             UserMsgTabItemListInsta=new ObservableCollection<UserMsgTabItem>();
-            //UserMsgTabItemListInsta = new ObservableCollection<UserInstaMsgTabItem>();
+            UserMsgTabItemListInsta = new ObservableCollection<UserMsgTabItem>();
             LoginImageInfo = new ObservableCollection<ImageLoginTextbox>();
             InstaListmembers = new ObservableCollection<InstaInboxmember>();
             FbPageListmembers = new ObservableCollection<FacebookPageInboxmember>();
-            //FbPageInboxmember = new ObservableCollection<FacebookPageInboxmember>();
             UserListInfo = new ObservableCollection<FbpageInboxUserInfo>();
             MessagingListInfo = new ObservableCollection<FbUserMessageInfo>();
             messagingFbpageListInfo = new ObservableCollection<FbUserMessageInfo>();
             messagingInstapageListInfo = new ObservableCollection<FbUserMessageInfo>();
 
             SendMessageCommand = new DelegateCommand(SendMessageCommandHandler, null);
-            SendMessageInstaCommand = new DelegateCommand(SendMessageInstaCommandhandlar,null);
+            SendMessageInstaCommand = new DelegateCommand(SendMessageInstaCommandhandlar, null);
             LoginCommand = new DelegateCommand(LoginCommandHandler, null);
             FbMessengerListCommand = new DelegateCommand(FbMessengerListCommandHandler, null);
             IntaInboxCommand = new DelegateCommand(IntaInboxCommandHandler, null);
@@ -77,60 +91,58 @@ namespace Fb_InstaWpf.ViewModel
             TabCtrlLoaded = new DelegateCommand(TabCtrlLoadedCommandHandler, null);
             Tab2CtrlLoaded = new DelegateCommand(Tab2CtrlLoadedCommandHandler, null);
             Tab0CtrlLoaded = new DelegateCommand(Tab0CtrlLoadedCommandHandler, null);
-            cmbUserLoaded = new DelegateCommand(cmbUserLoadedHandler, null);
+            //  cmbUserLoaded = new DelegateCommand(cmbUserLoadedHandler, null);
             ImageProgressBarLoaded = new DelegateCommand(ImageProgressBarLoadedCommandHandler, null);
-              CloseTabCommand = new DelegateCommand(CloseTab);
+            CloseTabCommand = new DelegateCommand(CloseTab);
 
             CreateColumn();
-            ShowMessengerListData();
-            //ShowFacebookListData();
 
-            timer = new System.Timers.Timer(1000); //it will run every one second
-            fbTimer = new System.Timers.Timer(1000);
-            InstaTimer = new System.Timers.Timer(1000);
+            _onlineFetcher = new OnlineFetcher();
+            _onlinePoster = new OnlinePoster();
+            _dbHelper = new DbHelper();
 
-            //printer = new Thread(new ThreadStart(GetUserChatBoxHistory));
-            //printer.Start();
-            }
+            Task.Factory.StartNew(() => FillUserList());
+        }
+
+        private void FillUserList()
+        {
+            var data = _dbHelper.GetLoginUsers();
+            Dispatcher.CurrentDispatcher.Invoke(() =>
+            {
+                LoginUsersList = data;
+                SelectedMainUser = data.FirstOrDefault();
+                Task.Factory.StartNew(() => ShowMessengerListData(SelectedMainUser));
+            });
+
+
+        }
+
+        private void ShowMessengerListData(FacebookUserLoginInfo user)
+        {
+            if (user == null) return;
+
+            var data = _dbHelper.GetFbMessengerListData(user.UserId);
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                UserListInfo = data;
+                SelectedUserInfo = data.FirstOrDefault();
+            }          
+            );
+
+        }
 
         private void SendMessageInstaCommandhandlar(object obj)
         {
             MessagingInstapageListInfo.Add(new FbUserMessageInfo { UserType = 0, Message = FbInstaTextBxValue });
-            // string url = "https://www.facebook.com/TP-1996120520653285/inbox/?selected_item_id=1996233970641940";
-            //    ChromeWebDriver.Navigate().GoToUrl(url);
-            Thread.Sleep(2000);
-            ReadOnlyCollection<IWebElement> postcomment = ChromeWebDriver.FindElements(By.XPath("//*[@class='UFICommentContainer']"));
-            if (postcomment.Count > 0)
-            {
-                postcomment[0].Click();
-                ReadOnlyCollection<IWebElement> postcomghghment = ChromeWebDriver.FindElements(By.XPath("//*[@class='notranslate _5rpu']"));
-                if (postcomghghment.Count > 0)
-                {
-                    postcomghghment[0].SendKeys(FbInstaTextBxValue);
-                    Thread.Sleep(1000);
-                    postcomghghment[0].SendKeys(OpenQA.Selenium.Keys.Enter);
-                }
 
-            }
+            _dbHelper.Add(new PostMessage() { FromUserId = "", ImagePath = "", MessageType = MessageType.InstaMessage });
         }
-
-     
-
-        private void dispatcherTimer_Tick(object sender, EventArgs e)
-        {
-           // ShowMessengerListData();
-        }
-        
-     
-
-
-
 
         private void ImageProgressBarLoadedCommandHandler(object obj)
         {
             Image = obj as System.Windows.Controls.Image;
         }
-
 
         void CreateColumn()
         {
@@ -151,7 +163,7 @@ namespace Fb_InstaWpf.ViewModel
         private FacebookPageInboxmember _selectedFbPageInboxmember;
         private InstaInboxmember _selectedInstaInboxmember;
         private FacebookPageInboxmember SelectedFbPageInboxmember;
-        
+
         private int _messageIdount;
         public string UrlName;
         private string _textcommet = string.Empty;
@@ -323,8 +335,8 @@ namespace Fb_InstaWpf.ViewModel
 
         public ObservableCollection<InstaInboxmember> InstaListmembers
         {
-            get { return _instaInboxmember; }
-            set { _instaInboxmember = value; }
+            get { return InstaInboxmember; }
+            set { InstaInboxmember = value; }
         }
 
         public InstaInboxmember SelectedInstaInboxmemberInfo
@@ -388,7 +400,7 @@ namespace Fb_InstaWpf.ViewModel
         #region Methods
         private void SendimageFBCommandHandler(object obj)
         {
-            OnlinePoster.Add(new PostMessage()
+            _dbHelper.Add(new PostMessage()
             {
                 Message = TextBxValue,
                 MessageType = MessageType.FacebookImage,
@@ -439,6 +451,18 @@ namespace Fb_InstaWpf.ViewModel
 
         private void SendImageCommandHandler(object obj)
         {
+            string fileName = ShowDialogAndFetchFileName();
+
+            PostMessage message = new PostMessage()
+            {
+                MessageType = MessageType.FacebookMessengerImage,
+                ImagePath = fileName,
+            };
+            _dbHelper.Add(message);
+        }
+
+        private static string ShowDialogAndFetchFileName()
+        {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "Image files (*.jpg)|*.png|All files (*.*)|*.*";
             string fileName = string.Empty;
@@ -447,14 +471,8 @@ namespace Fb_InstaWpf.ViewModel
                 fileName = openFileDialog.FileName;
             }
             else
-                System.Windows.MessageBox.Show("Please select image");
-
-            PostMessage message = new PostMessage()
-            {
-                MessageType = MessageType.FacebookMessengerImage,
-                ImagePath = fileName,
-            };
-            OnlinePoster.Add(message);
+                MessageBox.Show("Please select image");
+            return fileName;
         }
 
         private void FbPageInboxCommandHandler(object obj)
@@ -463,48 +481,29 @@ namespace Fb_InstaWpf.ViewModel
             {
                 ShowFacebookListData();
 
-                fbTimer.Elapsed += fbTimer_Elapsed;
-                fbTimer.Start();
-               // Showimage();
-                TabControl.SelectedIndex = Convert.ToInt16(obj);
                
+                // Showimage();
+                TabControl.SelectedIndex = Convert.ToInt16(obj);
+
             }
             catch (Exception)
             {
 
-                ;
             }
         }
 
         void fbTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             ShowFacebookListData();
-            Application.Current.Dispatcher.Invoke(()=>
+            Application.Current.Dispatcher.Invoke(() =>
               Image.Visibility = Visibility.Hidden
             );
-          
+
         }
 
         private void ShowFacebookListData()
         {
-            FbPageListmembers = DbHelper.ShowFacebookListData();
-            //string query = "select Fbcomment_InboxUserName,Fbcomment_InboxUserImage,FBInboxNavigationUrl from TblFbComment";
-            //var dt = sql.GetDataTable(query);
-            //foreach (DataRow item in dt.Rows)
-            //{
-            //    string Fbcomment_InboxUserName = Convert.ToString(item["Fbcomment_InboxUserName"]);
-            //    string Fbcomment_InboxUserImage = Convert.ToString(item["Fbcomment_InboxUserImage"]);
-            //    string FBInboxNavigationUrl = Convert.ToString(item["FBInboxNavigationUrl"]);
-            //    if (!FbPageListmembers.Any(m => m.FbPageName.Equals(Fbcomment_InboxUserName)))
-            //    {
-            //        FbPageListmembers.Add(new FacebookPageInboxmember()
-            //        {
-            //            FbPageName = Fbcomment_InboxUserName,
-            //            FbPageImage = Fbcomment_InboxUserImage,
-            //            FBInboxNavigationUrl = FBInboxNavigationUrl
-            //        });
-            //    }
-            //}
+            FbPageListmembers = _dbHelper.GetFacebookListData();        
         }
 
         private void Showimage()
@@ -515,8 +514,7 @@ namespace Fb_InstaWpf.ViewModel
         private void IntaInboxCommandHandler(object obj)
         {
             // InstaTimer
-            InstaTimer.Elapsed += InstaTimer_Elapsed;
-            InstaTimer.Start();
+           
             TabControl.SelectedIndex = Convert.ToInt16(obj);
             ListUsernameInfo listUsernameInfo = new ListUsernameInfo();
             // string commentinsta = (new TextRange(RichTextBoxinsta.Document.ContentStart, RichTextBoxinsta.Document.ContentEnd).Text).Trim();
@@ -575,23 +573,6 @@ namespace Fb_InstaWpf.ViewModel
                     #endregion
                 }
             }
-
-
-
-            //ReadOnlyCollection<IWebElement> commentpostNameCollection = ChromeWebDriver.FindElements(By.XPath(".//*[@class='_284g _4bl9']/div/div/span"));
-            //if (commentpostNameCollection.Count>0)
-            //{
-            //    for (int i = 0; i < commentpostNameCollection.Count; i++)
-            //    {
-            //        if (i % 2 == 0)
-            //        {
-            //            string dataName = commentpostNameCollection[i].Text;
-            //            InstaListmembers.Add(new InstaInboxmember { InstaInboxUserImage = _queueInstaImgUrl.Dequeue(), InstaInboxUserName = dataName });
-            //        }
-
-            //    }
-            //}
-            //
         }
 
         void InstaTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
@@ -635,51 +616,9 @@ namespace Fb_InstaWpf.ViewModel
             InstaListmembers.Add(new InstaInboxmember { InstaInboxUserName = "Instagram Page2 Post", InstaInboxUserImage = "E:\\RAHUL_WORK\\WPF_Examples\\Fb_InstaWpf12052018\\Fb_InstaWpf\\Fb_InstaWpf\\Images\\download.jpg" });
         }
 
-        private void cmbUserLoadedHandler(object obj)
-        {
-            cmbUser = obj as System.Windows.Controls.ComboBox;
-            BindComboBox();
-
-        }
-
         private string fileName = Properties.Settings.Default.Filename;
         private DataTable dtuserCredential = new DataTable();
-        void BindComboBox()
-        {
-
-            if (File.Exists(fileName))
-            {
-                //File.Delete(fileName);
-                var file = File.ReadAllLines(fileName);
-                dtuserCredential.Clear();
-                DataRow dr = dtuserCredential.NewRow();
-                dr["Password"] = 0;
-                dr["UserName"] = "--Select--";
-                dtuserCredential.Rows.InsertAt(dr, 0);
-                //ds.Tables[0].Rows.InsertAt(rowSelect, 0)
-                foreach (string s in file)
-                {
-                    string[] splitedItems = s.Split(':');
-                    if (splitedItems.Length > 0)
-                    {
-                        if (splitedItems.Length > 1)
-                        {
-                            dr = dtuserCredential.NewRow();
-                            dr["UserName"] = splitedItems[0];
-                            dr["Password"] = splitedItems[1];
-
-                            dtuserCredential.Rows.Add(dr);
-                        }
-
-                    }
-
-                }
-                cmbUser.ItemsSource = dtuserCredential.DefaultView;
-                cmbUser.DisplayMemberPath = Convert.ToString(dtuserCredential.Columns["UserName"]);
-                cmbUser.SelectedValuePath = Convert.ToString(dtuserCredential.Columns["Password"]);
-            }
-        }
-
+      
         public System.Windows.Controls.Image Image { get; set; }
 
         public System.Windows.Controls.ComboBox cmbUser
@@ -773,8 +712,8 @@ namespace Fb_InstaWpf.ViewModel
                     }
 
                     Thread.Sleep(5000);
-                    ShowMessengerListData();
-                   // GetFbMessengerListData();
+                    // ShowMessengerListData();
+                    // GetFbMessengerListData();
                     Thread.Sleep(2000);
                     MessageBox.Show("Login Successful.......!");
                     isLoggedIn = true;
@@ -790,9 +729,10 @@ namespace Fb_InstaWpf.ViewModel
                 //;
             }
         }
+
         SqLiteHelper sql = new SqLiteHelper();
         #region GetFbMessengerListData()
-     
+
         #endregion
 
         private void FbMessengerListCommandHandler(object obj)
@@ -805,7 +745,7 @@ namespace Fb_InstaWpf.ViewModel
         {
             //string query = "select M_InboxUserId,PlateformType,PostType,Message,ImgSource from TblJob where M_InboxUserId='" + userId + "'";
 
-            string query = "select M_InboxUserId,PlateformType,PostType,Message,ImgSource from TblJob";
+            string query = "select M_InboxUserId,PlateformType,PostType,Message,ImgSource from TblJob where M_InboxUserId='" + userId + "'";
 
             var dt = sql.GetDataTable(query);
             foreach (DataRow item in dt.Rows)
@@ -818,17 +758,17 @@ namespace Fb_InstaWpf.ViewModel
                 string ImgSource = Convert.ToString(item["ImgSource"]);
                 if (PostType == "0")
                 {
-                    MessagingListInfo.Add(new FbUserMessageInfo { UserType = 0, Message = Message,loginguserFbimage= ImgSource });
+                    MessagingListInfo.Add(new FbUserMessageInfo { UserType = 0, Message = Message, loginguserFbimage = ImgSource });
                 }
                 else if (PostType == "1")
                 {
-                    MessagingListInfo.Add(new FbUserMessageInfo { UserType = 1, Message = Message,otheruserimage= ImgSource });
+                    MessagingListInfo.Add(new FbUserMessageInfo { UserType = 1, Message = Message, otheruserimage = ImgSource });
                 }
 
                 MessagingListInfo.Add(new FbUserMessageInfo { UserType = 0, Message = Message });
 
-                  
-             
+
+
             }
 
 
@@ -843,7 +783,7 @@ namespace Fb_InstaWpf.ViewModel
             if (!UserMessengerTabItemList.Any(m => m.Header.Equals(fbpageInboxUserInfo.InboxUserName)))
             {
                 UserMessengerTabItemList.Add(new UserMsgTabItem() { Header = fbpageInboxUserInfo.InboxUserName, MessagingListInfo = MessagingListInfo });
-               //printer.Start();
+                //printer.Start();
                 if (isLoggedIn)
                 {
                     GetUserChatBoxHistory();
@@ -853,10 +793,10 @@ namespace Fb_InstaWpf.ViewModel
 
                     BindUserInfo(fbpageInboxUserInfo.InboxUserId);
 
-                   // BindUserInfo();
+                    // BindUserInfo();
 
                 }
-                
+
             }
 
 
@@ -871,9 +811,11 @@ namespace Fb_InstaWpf.ViewModel
                 if (!UserMsgTabItemListFb.Any(m => m.HeaderFb.Equals(selectedFBPageInfo.FbPageName)))
                 {
                     UserMsgTabItemListFb.Add(new UserMsgTabItem() { HeaderFb = selectedFBPageInfo.FbPageName, MessagingListInfo = MessagingFbpageListInfo });
+                   // MessagingFbpageListInfo=  _dbHelper.get();
+
                     //if (isLoggedIn)
                     //{
-                    GetFacebookCommenter();
+                    // GetFacebookCommenter();
                     //}
                     //else
                     //{
@@ -909,7 +851,7 @@ namespace Fb_InstaWpf.ViewModel
                     MessagingListInfo = MessagingInstapageListInfo
                 });
 
-               // GetInstaCommenter();
+                // GetInstaCommenter();
             }
         }
 
@@ -920,13 +862,15 @@ namespace Fb_InstaWpf.ViewModel
         string ImgSource = "1";
         string Status = "1";
         bool isLoggedIn = false;
+        private ObservableCollection<FacebookUserLoginInfo> _loginUsersList;
+        private FacebookUserLoginInfo _selectedMainUser;
 
         public void GetUserChatBoxHistory()
         {
             try
             {
-                ShowMessengerListData();
-                if ( isLoggedIn)
+                //ShowMessengerListData();
+                if (isLoggedIn)
                     GetUserChatBoxDataOnline();
             }
             catch (Exception)
@@ -934,13 +878,11 @@ namespace Fb_InstaWpf.ViewModel
                 ;
             }
 
-           
+
         }
 
         private void GetUserChatBoxDataOnline()
         {
-
-
             ChromeWebDriver.Navigate().GoToUrl(SelectedUserInfo.InboxNavigationUrl);
             Thread.Sleep(2000);
             PageSource = ChromeWebDriver.PageSource;
@@ -952,8 +894,7 @@ namespace Fb_InstaWpf.ViewModel
             {
                 currentURL = ChromeWebDriver.Url;
                 var tempId = currentURL.Split('?')[1].Split('=')[1];
-                timer.Elapsed += TimeRefreshchatBox_Tick;
-                timer.Start();
+               
                 HtmlNode selectSingleNode = htmlNodeDiv.SelectSingleNode(".//*[@class='clearfix _o46 _3erg _29_7 direction_ltr text_align_ltr']");
 
                 if (selectSingleNode != null)
@@ -1018,115 +959,22 @@ namespace Fb_InstaWpf.ViewModel
             }
         }
 
-        private void TimeRefreshchatBox_Tick(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            string query1 = "select Count(*) from TblJob where Message='" + chat + "'and ImgSource='" + imagesrc + "'";
-            sql.ExecuteScalar(query1);
-        }
+        //private void TimeRefreshchatBox_Tick(object sender, System.Timers.ElapsedEventArgs e)
+        //{
+        //    string query1 = "select Count(*) from TblJob where Message='" + chat + "'and ImgSource='" + imagesrc + "'";
+        //    sql.ExecuteScalar(query1);
+        //}
 
-        private void GetFacebookCommenter()
-        {
-            try
-            {
-                ChromeWebDriver.Navigate().GoToUrl(SelectedFBPageInfo.FBInboxNavigationUrl);
-                Thread.Sleep(3000);
-                PageSource = ChromeWebDriver.PageSource;
-                _htmlDocument.LoadHtml(PageSource);
-                Thread.Sleep(3000);
-                HtmlNodeCollection commentNode = _htmlDocument.DocumentNode.SelectNodes("//div[@class='_5v3q _5jmm _5pat _11m5']");
-
-                foreach (HtmlNode htmlcommentNode in commentNode)
-                {
-                    HtmlNode selectNode = htmlcommentNode.SelectSingleNode("//div[@class='_4vv0 _3ccb']");
-                    var pagename = selectNode.InnerText;
-                    MessagingFbpageListInfo.Add(new FbUserMessageInfo { UserType = 0, Message = pagename });
-
-                    HtmlNode pageimg = htmlcommentNode.SelectSingleNode("//img[@class='scaledImageFitWidth img']");
-
-                    var imgsrc = pageimg.Attributes["src"].Value.Replace(";", "&");
-                    MessagingFbpageListInfo.Add(new FbUserMessageInfo { UserType = 3, loginguserFbimage = imgsrc });
-                }
-
-                HtmlNodeCollection commentBlock = _htmlDocument.DocumentNode.SelectNodes("//div[@class='UFICommentContent']");
-                var commentImg = string.Empty;
-                foreach (HtmlNode commentitem in commentBlock)
-                {
-                    var pagenamee = commentitem.InnerText;
-                    var comment = pagenamee.Replace("Manage", "");
-
-                    MessagingFbpageListInfo.Add(new FbUserMessageInfo { UserType = 1, Message = comment });
-
-
-                    Regex regex = new Regex(@"src(.*?)alt");
-                    Match match = regex.Match(commentitem.InnerHtml);
-                    if (match.Length != 0)
-                    {
-                        string[] msgId = match.Value.Replace(";", "&").Split('"');
-                        var img = msgId[1];
-
-                        MessagingFbpageListInfo.Add(new FbUserMessageInfo { UserType = 2, otheruserFbimage = img });
-                    }
-                }
-                
-            }
-            catch (Exception)
-            {
-
-                ;
-            }
-            for (int i = 0; i < MessagingFbpageListInfo.Count; i++)
-            {
-                chatFb = MessagingFbpageListInfo[i].Message;
-                imagesrcFb = MessagingFbpageListInfo[i].loginguserimage;
-                var otherimagesrc = MessagingFbpageListInfo[i].otheruserimage;
-
-                string query1 = "select Count(*) from TblJobFb where Message='" + chatFb + "'and ImageSource='" + imagesrcFb + "'";
-                SqLiteHelper sql1 = new SqLiteHelper();
-                int count = Convert.ToInt32(sql1.ExecuteScalar(query1));
-
-                if (count == 0)
-                {
-                    string query = "INSERT INTO TblJobFb(PlateformType,Message,ImageSource) values('" + PlateformType + "','" + chatFb + "','" + imagesrcFb + "')";
-                    SqLiteHelper sql = new SqLiteHelper();
-                    int yy = sql.ExecuteNonQuery(query);
-                }
-            }
-
-
-        }
-
-        
-
-
+    
 
         public void SendMessageCommandHandler(object j)
         {
-            //_worker.DoWork += worker_DoWork;
-            //_worker.RunWorkerCompleted += worker_RunWorkerCompleted;
-            //_worker.RunWorkerAsync();
-
-
-            MessagingListInfo.Add(new FbUserMessageInfo { UserType = 0, Message = TextBxValue });
-
-            //MessagingListInfo.Add(new FbUserMessageInfo { UserType = 0, Message = textBxValue });
-            // string textcommet = (new TextRange(RichTextBoxmsngr.Document.ContentStart, RichTextBoxmsngr.Document.ContentEnd).Text).Trim();
-            //string textcommet = TextBox2.Text;
-           
+           _dbHelper.Add(new PostMessage() { FromUserId = SelectedMainUser.UserId, ToUserId = SelectedUserInfo.InboxUserId, Message = TextBxValue, MessageType = MessageType.FacebookMessage });
 
         }
 
-        private void worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            //  new NotImplementedException();
-        }
-        private void worker_DoWork(object sender, DoWorkEventArgs e)
-        {
-          
-        }
         #endregion
-
-
-
+        
         public string chat { get; set; }
 
         public string imagesrc { get; set; }
@@ -1144,5 +992,7 @@ namespace Fb_InstaWpf.ViewModel
         public ChromeDriver ChromeWebDriver { get; set; }
 
         public string FbInstaTextBxValue { get; set; }
+        public ObservableCollection<InstaInboxmember> InstaInboxmember { get => InstaInboxmember1; set => InstaInboxmember1 = value; }
+        public ObservableCollection<InstaInboxmember> InstaInboxmember1 { get => _instaInboxmember; set => _instaInboxmember = value; }
     }
 }

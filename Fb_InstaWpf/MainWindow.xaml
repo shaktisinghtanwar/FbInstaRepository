@@ -168,12 +168,12 @@
                     <ColumnDefinition Width="129*" ></ColumnDefinition>
                 </Grid.ColumnDefinitions>
                 <Button x:Name="btnUserLogins" Grid.Column="0" FontWeight="Bold" Content="Add UserLogin" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Margin="3,6,0,8" VerticalAlignment="Center" Width="100" Height="32" Click="btnUserLogins_Click" />
-                <ComboBox Name="cmbUser"  Grid.Column="1" Margin="0,2,0,3"  ItemsSource="{Binding cmbUserLoaded}" BorderThickness="0" VerticalAlignment="Center" Height="32">
-                    <i:Interaction.Triggers>
+                <ComboBox Name="cmbUser"  Grid.Column="1" Margin="0,2,0,3"  ItemsSource="{Binding LoginUsersList}" SelectedItem="{Binding Path=SelectedMainUser}" DisplayMemberPath="LoginUserName" SelectedValuePath="UserId" BorderThickness="0" VerticalAlignment="Center" Height="32">
+                    <!--<i:Interaction.Triggers>
                         <i:EventTrigger EventName="Loaded" >
                             <i:InvokeCommandAction Command="{Binding cmbUserLoaded}" CommandParameter="{Binding ElementName=cmbUser}" />
                         </i:EventTrigger>
-                    </i:Interaction.Triggers>
+                    </i:Interaction.Triggers>-->
                     <ComboBox.Background>
                         <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
                             <GradientStop Color="#FFF0F0F0" Offset="0"/>
