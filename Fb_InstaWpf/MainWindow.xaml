@@ -595,7 +595,7 @@
                                             </DataTemplate>
                                         </TabControl.ContentTemplate>
                                     </TabControl>
-                                    <!--Rishab-->
+                                    <!--Rishab -->
 
                                 </Grid>
 
@@ -613,7 +613,7 @@
                                         <RichTextBox   x:Name="RichTextBoxmsngr2"  HorizontalAlignment="Left"    Grid.Column="1" Margin="10,18,0,16" KeyDown="RichTextBoxmsngr_KeyDown"  BorderThickness="0"  >
                                             <FlowDocument>
                                                 <Paragraph>
-                                                    <Run x:Name="msgtxtbox4" Text="{Binding Path=TextBxValue}"/>
+                                                    <Run x:Name="msgtxtbox4" Text="{Binding Path=FbInstaTextBxValue}"/>
                                                 </Paragraph>
                                             </FlowDocument>
                                         </RichTextBox>
@@ -621,7 +621,7 @@
                                     <StackPanel VerticalAlignment="Center" Grid.Column="1" Width="180" Orientation="Horizontal">
 
 
-                                        <Button x:Name="btnSendText2" Content="Send"  Margin="5"  Height="35" Background="{x:Null}" FontWeight="Bold" FontSize="16" Foreground="#FF3399FF" BorderThickness="0" Command="{Binding SendMessageCommand}"   />
+                                        <Button x:Name="btnSendText2" Content="Send"  Margin="5"  Height="35" Background="{x:Null}" FontWeight="Bold" FontSize="16" Foreground="#FF3399FF" BorderThickness="0" Command="{Binding SendMessageInstaCommand}"   />
                                     </StackPanel>
                                 </Grid>
 
