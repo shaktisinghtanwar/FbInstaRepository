@@ -890,18 +890,25 @@ namespace Fb_InstaWpf.ViewModel
 
         private void BindUserInfo(string userId)
         {
+<<<<<<< HEAD
+=======
+>>>>>>> 3eab17b4425f570cb2bf5d7dabafbb642567dbd1
             //UserListInfo.Add(new FbpageInboxUserInfo { InboxUserName = "rahul baba" });
             //UserListInfo.Add(new FbpageInboxUserInfo { InboxUserName = "YoYO baba" });
             //UserListInfo.Add(new FbpageInboxUserInfo { InboxUserName = "Tiger baba" });
 
 
             string query = "select M_InboxUserId,PlateformType,PostType,Message,ImgSource from TblJob where M_InboxUserId='" + userId + "'";
+=======
+            string query = "select M_InboxUserId,PlateformType,PostType,Message,ImgSource from TblJob";
+>>>>>>> 3eab17b4425f570cb2bf5d7dabafbb642567dbd1
             var dt = sql.GetDataTable(query);
             foreach (DataRow item in dt.Rows)
             {
 
                 string inboxUserId = Convert.ToString(item["M_InboxUserId"]);
                 string PlateformType = Convert.ToString(item["PlateformType"]);
+<<<<<<< HEAD
 
                 string PostType = Convert.ToString(item["PostType"]);
                 string Message = Convert.ToString(item["Message"]);
@@ -914,6 +921,12 @@ namespace Fb_InstaWpf.ViewModel
                 {
                     MessagingListInfo.Add(new FbUserMessageInfo { UserType = 1, Message = Message,otheruserimage= ImgSource });
                 }
+=======
+                string PostType = Convert.ToString(item["PostType"]);
+                string Message = Convert.ToString(item["Message"]);
+                string ImgSource = Convert.ToString(item["ImgSource"]);
+                MessagingListInfo.Add(new FbUserMessageInfo { UserType = 0, Message = Message });
+>>>>>>> 3eab17b4425f570cb2bf5d7dabafbb642567dbd1
                   
              
             }
@@ -938,6 +951,9 @@ namespace Fb_InstaWpf.ViewModel
                 else
                 {
                     BindUserInfo(fbpageInboxUserInfo.InboxUserId);
+=======
+                    BindUserInfo();
+>>>>>>> 3eab17b4425f570cb2bf5d7dabafbb642567dbd1
                 }
                 
             }
@@ -1046,6 +1062,7 @@ namespace Fb_InstaWpf.ViewModel
                     string query = "INSERT INTO TblJob(M_InboxUserId,PlateformType,PostType,Message,ImgSource,Status) values('" + tempId + "','" + PlateformType + "','" + 0 + "','" + otheruser + "','" + imagesrc + "','" + Status + "')";
                     SqLiteHelper sql = new SqLiteHelper();
                     int yy = sql.ExecuteNonQuery(query);
+
 
                 }
 
