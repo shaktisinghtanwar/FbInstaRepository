@@ -892,12 +892,14 @@ namespace Fb_InstaWpf.ViewModel
         {
 <<<<<<< HEAD
 =======
+            //BindUserInfoByApi();
 >>>>>>> 3eab17b4425f570cb2bf5d7dabafbb642567dbd1
             //UserListInfo.Add(new FbpageInboxUserInfo { InboxUserName = "rahul baba" });
             //UserListInfo.Add(new FbpageInboxUserInfo { InboxUserName = "YoYO baba" });
             //UserListInfo.Add(new FbpageInboxUserInfo { InboxUserName = "Tiger baba" });
 
 
+<<<<<<< HEAD
             string query = "select M_InboxUserId,PlateformType,PostType,Message,ImgSource from TblJob where M_InboxUserId='" + userId + "'";
 =======
             string query = "select M_InboxUserId,PlateformType,PostType,Message,ImgSource from TblJob";
@@ -950,6 +952,7 @@ namespace Fb_InstaWpf.ViewModel
                 }
                 else
                 {
+<<<<<<< HEAD
                     BindUserInfo(fbpageInboxUserInfo.InboxUserId);
 =======
                     BindUserInfo();
