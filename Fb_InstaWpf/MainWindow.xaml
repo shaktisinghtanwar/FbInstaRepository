@@ -409,11 +409,12 @@
                                     </Grid.ColumnDefinitions>
                                     <Grid >
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="40"></ColumnDefinition>
+                                            <ColumnDefinition Width="80*"></ColumnDefinition>
                                             <ColumnDefinition></ColumnDefinition>
                                         </Grid.ColumnDefinitions>
-
-                                        <ListBox  ScrollViewer.HorizontalScrollBarVisibility="Disabled"   Height="40" Width="40" ItemsSource="{Binding LoginImageInfo}" >
+                                        <DockPanel Grid.Column="0">
+                                                                                  
+                                        <ListBox DockPanel.Dock="Left"  ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalAlignment="Left"  Height="60" Width="60" ItemsSource="{Binding LoginImageInfo}" >
                                             <ListBox.ItemTemplate>
                                                 <DataTemplate>
                                                     <Image  Source="{Binding loginimageurl}"  HorizontalAlignment="Left"   OpacityMask="Black"  />
@@ -423,13 +424,14 @@
 
 
                                         <!--<Image Source="Images/download.jpg" Width="40"  HorizontalAlignment="Left" Margin="5,18,0,16" OpacityMask="Black" Grid.ColumnSpan="2"/>-->
-                                        <RichTextBox   x:Name="RichTextBoxmsngr"  HorizontalAlignment="Left"    Grid.Column="1" Margin="10,18,0,16" KeyDown="RichTextBoxmsngr_KeyDown"  BorderThickness="1"  >
+                                        <RichTextBox DockPanel.Dock="Right" MinWidth="400"   x:Name="RichTextBoxmsngr"  HorizontalAlignment="Left" Margin="5,18,0,16" KeyDown="RichTextBoxmsngr_KeyDown"  BorderThickness="1"  >
                                             <FlowDocument>
                                                 <Paragraph>
                                                     <Run x:Name="msgtxtbox2" Text="{Binding Path=TextBxValue}"/>
                                                 </Paragraph>
                                             </FlowDocument>
                                         </RichTextBox>
+                                        </DockPanel>
                                     </Grid>
                                     <StackPanel VerticalAlignment="Center" Grid.Column="1" Width="180" Orientation="Horizontal">
                                         <Button HorizontalAlignment="Left" Margin="5"  Width="30" Height="35" Background="{x:Null}" BorderThickness="0" Command="{ Binding SendimageCommand}">
