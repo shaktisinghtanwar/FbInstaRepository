@@ -62,18 +62,14 @@ namespace Fb_InstaWpf.Model
 
     public class UserMsgTabItem: BaseViewModel
     {
-        public DelegateCommand CloseTabCommand { get; set; }
+     
 
         public UserMsgTabItem()
         {
-                        CloseTabCommand = new DelegateCommand(CloseTab);
+                       
 
         }
-        private void CloseTab(object obj)
-        {
-            string tabName = obj.ToString();
-            MessagingListInfo.Remove(messagingListInfo.FirstOrDefault(m => m.UserName == Header));
-        }
+     
         public string Header { get; set; }
         public string HeaderFb { get; set; }
         public string HeaderInsta { get; set;}

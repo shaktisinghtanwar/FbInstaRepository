@@ -36,15 +36,22 @@
 
             <Grid Background="Transparent" Width="400" HorizontalAlignment="Left" >
                 <Border HorizontalAlignment="Left"  Background="WhiteSmoke" CornerRadius="20">
-                    <TextBlock Focusable="False"  Width="auto" Margin="10" Text="{Binding Message}"  TextAlignment="Left" TextWrapping="Wrap"></TextBlock>
-                </Border>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="{Binding loginguserimage}"  Width="25" Height="25"   HorizontalAlignment="Left"></Image>
+                        <TextBlock Focusable="False"  Width="auto" Margin="10" Text="{Binding Message}"  TextAlignment="Left" TextWrapping="Wrap"></TextBlock>
+
+                    </StackPanel>
+              </Border>
             </Grid>
         </DataTemplate>
         <DataTemplate x:Key="OtherUserDataTemplate" >
             <Grid Background="Transparent" Width="400" HorizontalAlignment="Right">
                 <Border  HorizontalAlignment="Right" Background="RoyalBlue"  CornerRadius="20">
-                    <TextBlock  Width="auto" Text="{Binding Message}" Margin="10" Foreground="White"    TextAlignment="Right" TextWrapping="Wrap"></TextBlock >
-                </Border>
+                    <StackPanel Orientation="Horizontal">
+                        <Image  Source="{Binding otheruserimage}" Width="25" Height="25"    HorizontalAlignment="Right"></Image>
+                        <TextBlock  Width="auto" Text="{Binding Message}" Margin="10" Foreground="White"    TextAlignment="Right" TextWrapping="Wrap"></TextBlock >
+                    </StackPanel>
+                 </Border>
             </Grid>
         </DataTemplate>
         <DataTemplate x:Key="OtherimgDataTemplate" >
@@ -369,7 +376,7 @@
                                             <DataTemplate DataType="local:UserMsgTabItem">
                                                 <StackPanel Orientation="Horizontal">
                                                     <TextBlock Text="{Binding Header}"/>
-                                                    <Button Command="{Binding Path=CloseTabCommand}" CommandParameter="{Binding Path=Header}">
+                                                    <Button Command="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.CloseTabCommand}" CommandParameter="{Binding Path=Header}">
                                                         <Image Height="10" Width="10" Source="Images/if_cross-button_45933.png"/>
                                                     </Button>
                                                 </StackPanel>

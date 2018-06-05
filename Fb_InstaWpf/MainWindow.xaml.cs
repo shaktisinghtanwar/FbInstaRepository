@@ -1,31 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Linq;
-using System.Net.Http;
-using System.Reflection;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Windows.Threading;
 using Fb_InstaWpf.Helper;
 using Fb_InstaWpf.Model;
 using Fb_InstaWpf.ViewModel;
-using HtmlAgilityPack;
-using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace Fb_InstaWpf
 {
@@ -34,7 +15,7 @@ namespace Fb_InstaWpf
     /// </summary>
     public partial class ChatMessenger : Window
     {
-
+      
         //public ObservableCollection<FbpageInboxUserInfo> Files { get; set; }
         List<FbpageInboxUserInfo> Files = new List<FbpageInboxUserInfo>();
         public FbpageInboxUserInfo ObjFbpageInboxUserInfo = new FbpageInboxUserInfo();
@@ -44,10 +25,11 @@ namespace Fb_InstaWpf
             InitializeComponent();
 
             this.DataContext = new MainWindowViewModel();
+          
             //this.DataContext = new MasterViewModel();
 
         }
-
+      
         private void RichTextBoxmsngr_KeyDown(object sender, KeyEventArgs e)
         {
             if (msgtxtbox2.Text.Contains("Write a reply..."))

@@ -1,20 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Data;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using Fb_InstaWpf.Helper;
 using Fb_InstaWpf.Helper;
 using Fb_InstaWpf.Model;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using HtmlAgilityPack;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Windows.Forms;
 using System.IO;
 
 namespace Fb_InstaWpf.ViewModel
@@ -49,7 +38,7 @@ namespace Fb_InstaWpf.ViewModel
 
         void mainWindowViewModel_LoginCommandMethod()
         {
-            MessageBox.Show("hello............");
+           System.Windows. MessageBox.Show("hello............");
         }
        
 
