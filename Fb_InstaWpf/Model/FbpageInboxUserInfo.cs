@@ -23,6 +23,8 @@ namespace Fb_InstaWpf.Model
 
    public class FacebookPageInboxmember
    {
+
+       public string Fbcomment_InboxUserId { get; set; }
        public string FbPageName { get; set; }
        public string FbPageImage { get; set; }
        public string FBInboxNavigationUrl { get; set; }
@@ -31,6 +33,7 @@ namespace Fb_InstaWpf.Model
 
    public class InstaInboxmember
    {
+       public string Insta_inboxUserId { get; set; }
        public string InstaInboxUserName { get; set; }
        public string InstaInboxUserImage { get; set; }
        public string InstaInboxNavigationUrl { get; set; }

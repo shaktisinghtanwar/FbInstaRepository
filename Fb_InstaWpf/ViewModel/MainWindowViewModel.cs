@@ -53,9 +53,11 @@ namespace Fb_InstaWpf.ViewModel
 
         public FacebookUserLoginInfo SelectedMainUser
         {
-            get => _selectedMainUser;
+            get {return  _selectedMainUser;} 
             set { _selectedMainUser = value; OnPropertyChanged(); }
         }
+
+
         #endregion
 
         DbHelper _dbHelper;
@@ -102,7 +104,12 @@ namespace Fb_InstaWpf.ViewModel
             _dbHelper = new DbHelper();
 
             Task.Factory.StartNew(() => FillUserList());
+
+            //Task.Factory.StartNew(() => FillFacebookCmntList());
+
         }
+
+        
 
         private void FillUserList()
         {
@@ -112,10 +119,13 @@ namespace Fb_InstaWpf.ViewModel
                 LoginUsersList = data;
                 SelectedMainUser = data.FirstOrDefault();
                 Task.Factory.StartNew(() => ShowMessengerListData(SelectedMainUser));
+                
             });
 
 
         }
+
+
 
         private void ShowMessengerListData(FacebookUserLoginInfo user)
         {
@@ -131,6 +141,36 @@ namespace Fb_InstaWpf.ViewModel
             );
 
         }
+
+        private void ShowFbCommentListData(FacebookUserLoginInfo user)
+        {
+           
+            var data = _dbHelper.GetFacebookListData(user.UserId);
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                FbPageListmembers = data;
+                SelectedFBPageInfo = data.FirstOrDefault();
+            });
+
+
+        }
+
+        private void ShowInstaListData(FacebookUserLoginInfo user)
+        {
+
+            var data = _dbHelper.GetInstaUserList(user.UserId);
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                InstaListmembers = data;
+                SelectedInstaInboxmemberInfo = data.FirstOrDefault();
+
+            });
+
+
+        }
+
+
+
 
         private void SendMessageInstaCommandhandlar(object obj)
         {
@@ -271,7 +311,7 @@ namespace Fb_InstaWpf.ViewModel
 
 
 
-        #region FbPageListmembers Details
+        #region FbPageListmembers Details 
 
         private ObservableCollection<UserMsgTabItem> userMsgTabItemListFb;
 
@@ -479,7 +519,7 @@ namespace Fb_InstaWpf.ViewModel
         {
             try
             {
-                ShowFacebookListData();
+                Task.Factory.StartNew(() => ShowFbCommentListData(SelectedMainUser));
 
                
                 // Showimage();
@@ -494,17 +534,17 @@ namespace Fb_InstaWpf.ViewModel
 
         void fbTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            ShowFacebookListData();
+           // ShowFacebookListData();
             Application.Current.Dispatcher.Invoke(() =>
               Image.Visibility = Visibility.Hidden
             );
 
         }
 
-        private void ShowFacebookListData()
-        {
-            FbPageListmembers = _dbHelper.GetFacebookListData();        
-        }
+        //private void ShowFacebookListData()
+        //{
+        //    FbPageListmembers = _dbHelper.GetFacebookListData();
+        //}
 
         private void Showimage()
         {
@@ -516,90 +556,12 @@ namespace Fb_InstaWpf.ViewModel
             // InstaTimer
            
             TabControl.SelectedIndex = Convert.ToInt16(obj);
-            ListUsernameInfo listUsernameInfo = new ListUsernameInfo();
-            // string commentinsta = (new TextRange(RichTextBoxinsta.Document.ContentStart, RichTextBoxinsta.Document.ContentEnd).Text).Trim();
-            string url = "https://www.facebook.com/TP-1996120520653285/inbox/";
-            ChromeWebDriver.Navigate().GoToUrl(url);
-            Thread.Sleep(3000);
-
-            ReadOnlyCollection<IWebElement> collection = ChromeWebDriver.FindElements(By.ClassName("_32wr"));
-            {
-                if (collection.Count > 0)
-                {
-                    collection[2].Click();
-                    Thread.Sleep(3000);
-                }
-            }
-
-            ReadOnlyCollection<IWebElement> commentpostImgNodCollection = ChromeWebDriver.FindElements(By.XPath(".//*[@class='_11eg _5aj7']/div/div/img"));
-            if (commentpostImgNodCollection.Count > 0)
-            {
-                for (int i = 0; i < commentpostImgNodCollection.Count; i++)
-                {
-                    DataImg = commentpostImgNodCollection[i].GetAttribute("src");
-                    _queueInstaImgUrl.Enqueue(DataImg);
-                }
-            }
-
-            ReadOnlyCollection<IWebElement> userlistnode = ChromeWebDriver.FindElements(By.ClassName("_4k8x"));
-            if (userlistnode.Count > 0)
-            {
-                foreach (var itemurl in userlistnode)
-                {
-                    itemurl.Click();
-                    Thread.Sleep(3000);
-                    string userName = itemurl.Text;
-                    listUsernameInfo.ListUsername = userName;
-                    #region Rahul
-                    //listUsernameInfo.ListUsername;
-                    currentURL = ChromeWebDriver.Url;
-                    var tempId = currentURL.Split('?')[1].Split('=')[1];
-                    listUsernameInfo.ListUserId = tempId;
-                    listUsernameInfo.InboxNavigationUrl = currentURL;
-                    // _listUsernameInfo.ListUsername=LstItemUserName;
-                    _MyListUsernameInfo.Add(listUsernameInfo);
-
-                    var imgUrl = _queueInstaImgUrl.Dequeue();
-                    string query = "INSERT INTO Tbl_Instagram(Insta_inboxUserName,Insta_inboxUserImage,InstaInboxNavigationUrl,Status) values('" + userName + "','" + imgUrl + "','" + currentURL + "','" + false + "')";
-
-                    int yy = sql.ExecuteNonQuery(query);
-
-                    //InstaListmembers.Add(new InstaInboxmember()
-                    //{
-                    //    InstaInboxUserName = userName,
-                    //    InstaInboxUserImage = imgUrl,
-                    //    InstaInboxNavigationUrl = currentURL
-                    //});
-                    #endregion
-                }
-            }
+            Task.Factory.StartNew(() => ShowInstaListData(SelectedMainUser));
         }
 
-        void InstaTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            ShowInstaUserList();
-        }
+     
 
-        private void ShowInstaUserList()
-        {
-            string query = "select Insta_inboxUserName,Insta_inboxUserImage,InstaInboxNavigationUrl from Tbl_Instagram";
-            var dt = sql.GetDataTable(query);
-            foreach (DataRow item in dt.Rows)
-            {
-                string Insta_inboxUserName = Convert.ToString(item["Insta_inboxUserName"]);
-                string Insta_inboxUserImage = Convert.ToString(item["Insta_inboxUserImage"]);
-                string InstaInboxNavigationUrl = Convert.ToString(item["InstaInboxNavigationUrl"]);
-                if (!InstaListmembers.Any(m => m.InstaInboxUserName.Equals(Insta_inboxUserName)))
-                {
-                    InstaListmembers.Add(new InstaInboxmember()
-                    {
-                        InstaInboxUserName = Insta_inboxUserName,
-                        InstaInboxUserImage = Insta_inboxUserImage,
-                        InstaInboxNavigationUrl = InstaInboxNavigationUrl
-                    });
-                }
-            }
-        }
+       
 
 
         private void BIndFbPageData()
@@ -731,9 +693,7 @@ namespace Fb_InstaWpf.ViewModel
         }
 
         SqLiteHelper sql = new SqLiteHelper();
-        #region GetFbMessengerListData()
-
-        #endregion
+      
 
         private void FbMessengerListCommandHandler(object obj)
         {
@@ -992,7 +952,13 @@ namespace Fb_InstaWpf.ViewModel
         public ChromeDriver ChromeWebDriver { get; set; }
 
         public string FbInstaTextBxValue { get; set; }
-        public ObservableCollection<InstaInboxmember> InstaInboxmember { get => InstaInboxmember1; set => InstaInboxmember1 = value; }
-        public ObservableCollection<InstaInboxmember> InstaInboxmember1 { get => _instaInboxmember; set => _instaInboxmember = value; }
+        public ObservableCollection<InstaInboxmember> InstaInboxmember 
+        { get {return InstaInboxmember1; } 
+          set{InstaInboxmember1 = value;} 
+        }
+        public ObservableCollection<InstaInboxmember> InstaInboxmember1 
+        { get {return _instaInboxmember; }
+          set { _instaInboxmember = value; }
+        }
     }
 }

@@ -66,16 +66,17 @@ namespace Fb_InstaWpf
         }
 
 
-        public ObservableCollection<FacebookPageInboxmember> GetFacebookListData()
+        public ObservableCollection<FacebookPageInboxmember> GetFacebookListData(string userId)
         {
             SqLiteHelper sql = GetSqliteHelper();
-            ObservableCollection<FacebookPageInboxmember> FbPageListmembers =
-                new ObservableCollection<FacebookPageInboxmember>();
-            string query =
-                "select Fbcomment_InboxUserName,Fbcomment_InboxUserImage,FBInboxNavigationUrl from TblFbComment";
+            ObservableCollection<FacebookPageInboxmember> FbPageListmembers = new ObservableCollection<FacebookPageInboxmember>();
+
+            string query = "select Fbcomment_InboxUserId, Fbcomment_InboxUserName,Fbcomment_InboxUserImage,FBInboxNavigationUrl from TblFbComment where Parent_User_Id='" + userId + "'";
+               
             var dt = sql.GetDataTable(query);
             foreach (DataRow item in dt.Rows)
             {
+                string Fbcomment_InboxUserId = Convert.ToString(item["Fbcomment_InboxUserId"]);
                 string Fbcomment_InboxUserName = Convert.ToString(item["Fbcomment_InboxUserName"]);
                 string Fbcomment_InboxUserImage = Convert.ToString(item["Fbcomment_InboxUserImage"]);
                 string FBInboxNavigationUrl = Convert.ToString(item["FBInboxNavigationUrl"]);
@@ -83,6 +84,7 @@ namespace Fb_InstaWpf
                 {
                     FbPageListmembers.Add(new FacebookPageInboxmember()
                     {
+                        Fbcomment_InboxUserId=Fbcomment_InboxUserId,
                         FbPageName = Fbcomment_InboxUserName,
                         FbPageImage = Fbcomment_InboxUserImage,
                         FBInboxNavigationUrl = FBInboxNavigationUrl
@@ -115,6 +117,36 @@ namespace Fb_InstaWpf
             }
             return userListInfo;
         }
+
+
+        public ObservableCollection<InstaInboxmember> GetInstaUserList(string userId)
+        {
+            SqLiteHelper sql = new SqLiteHelper();
+
+            ObservableCollection<InstaInboxmember> InstaListmembers = new ObservableCollection<InstaInboxmember>();
+            string query = "select Insta_inboxUserId,Insta_inboxUserName,Insta_inboxUserImage,InstaInboxNavigationUrl from Tbl_Instagram where Parent_User_Id='"+ userId +"'";
+            var dt = sql.GetDataTable(query);
+            foreach (DataRow item in dt.Rows)
+            {
+                string InstainboxUserId = Convert.ToString(item["Insta_inboxUserId"]);
+                string Insta_inboxUserName = Convert.ToString(item["Insta_inboxUserName"]);
+                string Insta_inboxUserImage = Convert.ToString(item["Insta_inboxUserImage"]);
+                string InstaInboxNavigationUrl = Convert.ToString(item["InstaInboxNavigationUrl"]);
+                if (!InstaListmembers.Any(m => m.InstaInboxUserName.Equals(Insta_inboxUserName)))
+                {
+                    InstaListmembers.Add(new InstaInboxmember()
+                    {
+                        Insta_inboxUserId=InstainboxUserId,
+                        InstaInboxUserName = Insta_inboxUserName,
+                        InstaInboxUserImage = Insta_inboxUserImage,
+                        InstaInboxNavigationUrl = InstaInboxNavigationUrl
+                    });
+                }
+            }
+            return InstaListmembers;
+        }
+
+   
 
         internal void InsertFacebookCommentToDb(List<FbUserMessageInfo> messagingFbpageListInfo)
         {
