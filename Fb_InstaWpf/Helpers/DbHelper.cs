@@ -56,13 +56,29 @@ namespace Fb_InstaWpf
 
         public void InsertFbMessengerMessage( ListUsernameInfo listUsernameInfo, string userName, string imgUrl)
         {
-            var sql = GetSqliteHelper();
+            try
+            {
+                var sql = GetSqliteHelper();
+                var sql1 = GetSqliteHelper();
 
-            string query =
-                "INSERT INTO TblMessengerList(M_InboxUserId,M_inboxUserName,M_InboxUserImage,M_InboxNavigationUrl,Status) values('" +
-                listUsernameInfo.ListUserId + "','" + userName + "','" + imgUrl + "','" +
-                listUsernameInfo.InboxNavigationUrl + "','" + false + "')";
-            int yy = sql.ExecuteNonQuery(query);
+                string query1 = "select Count(*) from TblMessengerList where M_InboxUserId='" + listUsernameInfo.ListUserId + "'";
+
+                int count = Convert.ToInt32(sql1.ExecuteScalar(query1));
+                if (count == 0)
+                {
+                    string query =
+                        "INSERT INTO TblMessengerList(M_InboxUserId,M_inboxUserName,M_InboxUserImage,M_InboxNavigationUrl,Status) values('" +
+                        listUsernameInfo.ListUserId + "','" + userName + "','" + imgUrl + "','" +
+                        listUsernameInfo.InboxNavigationUrl + "','" + false + "')";
+                    int yy = sql.ExecuteNonQuery(query);
+                }
+            
+            }
+            catch (Exception)
+            {
+                    
+               
+            }
         }
 
 

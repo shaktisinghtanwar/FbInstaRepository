@@ -224,10 +224,10 @@
                             </StackPanel>
 
                         </TabItem.Header>
-<DockPanel>
+<DockPanel >
                             <Grid Background="#FFE5E5E5">
 
-                                <ListBox SelectedItem="{Binding SelectedUserInfo}"  HorizontalAlignment="Left" ItemsSource="{Binding UserListInfo}" >
+                                <ListBox SelectedItem="{Binding SelectedUserInfo}"  HorizontalAlignment="Left" ItemsSource="{Binding UserListInfo}">
                                     <ListBox.ItemContainerStyle>
                                         <Style TargetType="ListBoxItem">
                                             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -273,6 +273,7 @@
                                 <Image Width="20" Source="Images/facebook.png" />
                             </Button>
                         </TabItem.Header>
+                        <DockPanel>
                         <Grid Background="#FFE5E5E5">
                             <Grid.ColumnDefinitions>
                                 <!--<ColumnDefinition Width="49*"/>
@@ -307,11 +308,12 @@
                             </ListBox>
 
                         </Grid>
+                            </DockPanel>
                     </TabItem>
 
                     <TabItem x:Name="TabLeftItemInsta" Height="34" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="56" Margin="-2,-2,0,2" GotFocus="TabLeftItemInsta_GotFocus"  >
                         <TabItem.Header>
-                            <Button   Background="Transparent" Command="{Binding IntaInboxCommand}" CommandParameter="2">
+                            <Button   Background="Transparent" Command="{Binding InstaInboxCommand}" CommandParameter="2">
                                 <Image Width="36" Source="Images/instapic.jpg" Height="24"/>
                             </Button>
                         </TabItem.Header>
