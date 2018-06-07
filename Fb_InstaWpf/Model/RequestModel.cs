@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Fb_InstaWpf.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 namespace Fb_InstaWpf.Model {
 	class RequestModel {
 
-		public PlatformType PlatformType
+		public TabType PlatformType
 		{
 			get;
 			set;
@@ -31,11 +32,11 @@ namespace Fb_InstaWpf.Model {
 		}
 	}
 
-	enum PlatformType {
-	FacebookPage,
-	FacebookMessenger,
-	Instagram
-	}
+	//enum PlatformType {
+	//FacebookPage,
+	//FacebookMessenger,
+	//Instagram
+	//}
 
 	enum PostType {
 	Image,

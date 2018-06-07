@@ -15,8 +15,6 @@
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <NuGetPackageImportStamp>5fc94e32</NuGetPackageImportStamp>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">.\</SolutionDir>
-    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -55,6 +53,7 @@
       <HintPath>.\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="PresentationFramework.Aero" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
@@ -126,6 +125,9 @@
     <Compile Include="AddLoginUsers.xaml.cs">
       <DependentUpon>AddLoginUsers.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters\AddValuesWithHyhpen.cs" />
+    <Compile Include="DbModel\Class1.cs" />
+    <Compile Include="Enums\TabType.cs" />
     <Compile Include="Helpers\DbHelper.cs" />
     <Compile Include="Helpers\MessageType.cs" />
     <Compile Include="Helpers\OnlineFetcher.cs" />
@@ -134,12 +136,13 @@
     <Compile Include="Helper\DelegateCommand.cs" />
     <Compile Include="Helper\FileOperation.cs" />
     <Compile Include="Helper\MessageDataTemplateSelector.cs" />
-    <Compile Include="Model\ConstantClass.cs" />
     <Compile Include="Helper\SqLiteHelper.cs" />
+    <Compile Include="Model\ConstantClass.cs" />
     <Compile Include="Model\FbpageInboxUserInfo.cs" />
     <Compile Include="Model\FBUserMessageInfocs.cs" />
     <Compile Include="Model\MasterViewModel.cs" />
     <Compile Include="Model\RequestModel.cs" />
+    <Compile Include="Model\SocialUser.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="UpdateMyDelegatedelegate.cs" />
     <Compile Include="UpdateMyDelegatedelegate_2.cs" />
@@ -147,6 +150,13 @@
     <Compile Include="ViewModel\AddLoginUsersViewModel.cs" />
     <Compile Include="ViewModel\BaseViewModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
+    <Compile Include="ViewModel\SocialTabViewModel.cs" />
+    <Compile Include="View\SocialTabView.xaml.cs">
+      <DependentUpon>SocialTabView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\SocialUserMessagesView.xaml.cs">
+      <DependentUpon>SocialUserMessagesView.xaml</DependentUpon>
+    </Compile>
     <Page Include="AddLoginUsers.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -163,6 +173,54 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Themes\Button.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\ComboBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\GroupBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\Menu.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\ProgressBar.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\TabControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\TabItem.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\TextBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\ToolTip.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\TreeView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\SocialTabView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="View\SocialUserMessagesView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Model\FbUserInfo.cs" />
@@ -195,28 +253,54 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="View\" />
+    <Folder Include="Themes\Themes\" />
+    <Folder Include="UserInboxImages\" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\facebook.png" />
-    <Resource Include="Images\if_minimize_82798.png" />
-    <Resource Include="Images\min-max.png" />
-    <Resource Include="Images\instapic.jpg" />
-    <Resource Include="Images\adminImg.jpg" />
-    <Resource Include="Images\attached.png" />
-    <Resource Include="Images\downloasmileSticker.png" />
-    <Resource Include="Images\download.jpg" />
-    <Resource Include="Images\GrayBar.gif" />
-    <Content Include="Chromedriver\chromedriver.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Resource Include="Images\facebook.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\if_minimize_82798.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\min-max.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\instapic.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\adminImg.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\attached.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\downloasmileSticker.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\download.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\GrayBar.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Content Include="Lib\System.Data.SQLite.dll" />
-    <Resource Include="Images\if_comment_facebook_92596.png" />
+    <Resource Include="Images\if_comment_facebook_92596.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Images\if_Facebook_Messenger_1298720.png" />
-    <Resource Include="Images\if_Instagram_Color_1435162.png" />
-    <Resource Include="Images\if_cross-button_45933.png" />
-    <Resource Include="Images\2123874-16 %281%29.png" />
-    <Resource Include="Images\minimize-window-16.png" />
+    <Resource Include="Images\if_Instagram_Color_1435162.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\if_cross-button_45933.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\2123874-16 %281%29.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\minimize-window-16.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Content Include="Lib\LicenceApp.dll" />
     <Content Include="Lib\Newtonsoft.Json.dll" />
   </ItemGroup>
@@ -228,10 +312,8 @@
     </PropertyGroup>
     <Error Condition="!Exists('.\packages\Selenium.Chrome.WebDriver.2.38\build\Selenium.Chrome.WebDriver.targets')" Text="$([System.String]::Format('$(ErrorText)', '.\packages\Selenium.Chrome.WebDriver.2.38\build\Selenium.Chrome.WebDriver.targets'))" />
     <Error Condition="!Exists('packages\System.Data.SQLite.Core.1.0.108.0\build\net46\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\System.Data.SQLite.Core.1.0.108.0\build\net46\System.Data.SQLite.Core.targets'))" />
-    <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
   </Target>
   <Import Project="packages\System.Data.SQLite.Core.1.0.108.0\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('packages\System.Data.SQLite.Core.1.0.108.0\build\net46\System.Data.SQLite.Core.targets')" />
-  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

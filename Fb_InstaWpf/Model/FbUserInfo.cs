@@ -62,22 +62,17 @@ namespace Fb_InstaWpf.Model
 
     public class UserMsgTabItem: BaseViewModel
     {
-     
-
         public UserMsgTabItem()
         {
-                       
-
         }
      
         public string Header { get; set; }
-        public string HeaderFb { get; set; }
-        public string HeaderInsta { get; set;}
+        //public string HeaderFb { get; set; }
+        //public string HeaderInsta { get; set;}
 
         private ObservableCollection<FbUserMessageInfo> messagingListInfo;
         public ObservableCollection<FbUserMessageInfo> MessagingListInfo
         {
-
             get { return messagingListInfo; }
             set
             {
@@ -87,54 +82,50 @@ namespace Fb_InstaWpf.Model
 
             }
         }
-
-     
-
-        
     }
 
 
-    public class UserFbMsgTabItem : BaseViewModel
-    {
-        public string Header { get; set; }
-        public string HeaderFb { get; set; }
-        //public string HeaderInsta { get; set; }
-        private ObservableCollection<FbUserMessageInfo> messagingListInfo { get; set; }
-        public ObservableCollection<FbUserMessageInfo> MessagingListInfo
-        {
+    //public class UserFbMsgTabItem : BaseViewModel
+    //{
+    //    public string Header { get; set; }
+    //    public string HeaderFb { get; set; }
+    //    //public string HeaderInsta { get; set; }
+    //    private ObservableCollection<FbUserMessageInfo> messagingListInfo { get; set; }
+    //    public ObservableCollection<FbUserMessageInfo> MessagingListInfo
+    //    {
 
-            get { return messagingListInfo; }
-            set
-            {
-                messagingListInfo = value;
-                OnPropertyChanged("MessagingListInfo");
+    //        get { return messagingListInfo; }
+    //        set
+    //        {
+    //            messagingListInfo = value;
+    //            OnPropertyChanged("MessagingListInfo");
 
-            }
-        }
+    //        }
+    //    }
 
        
 
-    }
+    //}
 
-    public class UserInstaMsgTabItem : BaseViewModel
-    {
-        //public string Header { get; set; }
-        //public string HeaderFb { get; set; }
-        public string HeaderInsta { get; set; }
-        private ObservableCollection<FbUserMessageInfo> messagingListInfo { get; set; }
-        public ObservableCollection<FbUserMessageInfo> MessagingListInfo
-        {
+    //public class UserInstaMsgTabItem : BaseViewModel
+    //{
+    //    //public string Header { get; set; }
+    //    //public string HeaderFb { get; set; }
+    //    public string HeaderInsta { get; set; }
+    //    private ObservableCollection<FbUserMessageInfo> messagingListInfo { get; set; }
+    //    public ObservableCollection<FbUserMessageInfo> MessagingListInfo
+    //    {
 
-            get { return messagingListInfo; }
-            set
-            {
-                messagingListInfo = value;
-                OnPropertyChanged("MessagingListInfo");
+    //        get { return messagingListInfo; }
+    //        set
+    //        {
+    //            messagingListInfo = value;
+    //            OnPropertyChanged("MessagingListInfo");
 
-            }
-        }
+    //        }
+    //    }
        
        
-    }
+    //}
 
 }

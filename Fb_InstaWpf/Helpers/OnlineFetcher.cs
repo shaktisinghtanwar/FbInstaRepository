@@ -391,5 +391,83 @@ namespace Fb_InstaWpf
                 }
             }
         }
+
+        private void GetUserChatBoxDataOnline(string url)
+        {
+            ChromeWebDriver.Navigate().GoToUrl(url);
+            Thread.Sleep(2000);
+            var plateformType = "1";
+            var pageSource = ChromeWebDriver.PageSource;
+            var htmlDocument = new HtmlDocument();
+            htmlDocument.LoadHtml(pageSource);
+            Thread.Sleep(2000); 
+            HtmlNodeCollection imgNode = htmlDocument.DocumentNode.SelectNodes("//div[@class='_41ud']");
+
+            //foreach (HtmlNode htmlNodeDiv in imgNode)
+            //{
+            //    var currentURL = ChromeWebDriver.Url;
+            //    var tempId = currentURL.Split('?')[1].Split('=')[1];
+
+            //    HtmlNode selectSingleNode = htmlNodeDiv.SelectSingleNode(".//*[@class='clearfix _o46 _3erg _29_7 direction_ltr text_align_ltr']");
+
+            //    if (selectSingleNode != null)
+            //    {
+            //        string otheruser = selectSingleNode.InnerText;
+            //       // MessagingListInfo.Add(new FbUserMessageInfo { UserType = 0, Message = otheruser });
+            //        string query = "INSERT INTO TblJob(M_InboxUserId,PlateformType,PostType,Message,ImgSource,Status) values('" + tempId + "','" + plateformType + "','" + 0 + "','" + otheruser + "','" + imagesrc + "','" + Status + "')";
+            //        SqLiteHelper sql = new SqLiteHelper();
+            //        int yy = sql.ExecuteNonQuery(query);
+            //    }
+
+            //    HtmlNode selectSingleimgNode = htmlNodeDiv.SelectSingleNode(".//*[@class='clearfix _o46 _3erg _29_7 direction_ltr text_align_ltr _ylc']");
+            //    if (selectSingleimgNode != null)
+            //    {
+            //        Regex regex = new Regex(@"src(.*?)style");
+            //        Match match = regex.Match(selectSingleimgNode.InnerHtml);
+            //        string msgId = match.Value.Replace("src=", "").Replace("style", "").Replace("\"", "").Replace(@"""", "").Replace("amp;", "");
+            //        //MessagingListInfo.Add(new FbUserMessageInfo { UserType = 2, otheruserimage = msgId });
+            //    }
+            //    HtmlNode selectSingleNode2 = htmlNodeDiv.SelectSingleNode(".//*[@class='clearfix _o46 _3erg _3i_m _nd_ direction_ltr text_align_ltr']");
+            //    if (selectSingleNode2 != null)
+            //    {
+            //        string loginuser = selectSingleNode2.InnerText;
+            //        //MessagingListInfo.Add(new FbUserMessageInfo { UserType = 1, Message = loginuser });
+            //    }
+
+            //    HtmlNode selectSingleimgRightNode = htmlNodeDiv.SelectSingleNode(".//*[@class='clearfix _o46 _3erg _3i_m _nd_ direction_ltr text_align_ltr _ylc']");
+            //    if (selectSingleimgRightNode != null)
+            //    {
+            //        Regex regex = new Regex(@"src(.*?)style");
+            //        Match match = regex.Match(selectSingleimgRightNode.InnerHtml);
+            //        string msgId = match.Value.Replace("src=", "").Replace("style", "").Replace("\"", "").Replace(@"""", "").Replace("amp;", "");
+            //        //MessagingListInfo.Add(new FbUserMessageInfo { UserType = 3, loginguserimage = msgId });
+            //        string query = "INSERT INTO TblJob(M_InboxUserId,PlateformType,PostType,Message,ImgSource,Status) values('" + tempId + "','" + plateformType + "','" + 0 + "','" + chat + "','" + imagesrc + "','" + Status + "')";
+            //        SqLiteHelper sql = new SqLiteHelper();
+            //        int yy = sql.ExecuteNonQuery(query);
+            //    }
+
+            //}
+            Thread.Sleep(1000); // 5 Minutes
+
+            //for (int i = 0; i < MessagingListInfo.Count; i++)
+            //{
+            //    chat = MessagingListInfo[i].Message;
+            //    imagesrc = MessagingListInfo[i].loginguserimage;
+            //    otherimagesrc = MessagingListInfo[i].otheruserimage;
+            //    currentURL = ChromeWebDriver.Url;
+            //    var tempId = currentURL.Split('?')[1].Split('=')[1];
+            //    // listUsernameInfo.ListUserId = tempId;
+            //    string query1 = "select Count(*) from TblJob where Message='" + chat + "'and ImgSource='" + imagesrc + "'";
+            //    SqLiteHelper sql1 = new SqLiteHelper();
+            //    int count = Convert.ToInt32(sql1.ExecuteScalar(query1));
+
+            //    if (count == 0)
+            //    {
+            //        string query = "INSERT INTO TblJob(M_InboxUserId,PlateformType,PostType,Message,ImgSource,Status) values('" + tempId + "','" + plateformType + "','" + PostType + "','" + chat + "','" + imagesrc + "','" + Status + "')";
+            //        SqLiteHelper sql = new SqLiteHelper();
+            //        int yy = sql.ExecuteNonQuery(query);
+            //    }
+            //}
+        }
     }
 }
