@@ -134,6 +134,19 @@ namespace Fb_InstaWpf
             return userListInfo;
         }
 
+        //private void GetInstagramMessages(string userId)
+        //{
+        //    string query = "select Insta_inboxUserId,PlateformType,Message,ImageSource from TblJobFb where Fbcomment_InboxUserId='" + userId + "'";
+        //    var dt = sql.GetDataTable(query);
+        //    foreach (DataRow item in dt.Rows)
+        //    {
+        //        string InstainboxUserId = Convert.ToString(item["Insta_inboxUserId"]);
+        //        string PlateformType = Convert.ToString(item["PlateformType"]);
+        //        string Message = Convert.ToString(item["Message"]);
+        //        string ImgSource = Convert.ToString(item["ImageSource"]);
+        //        messagingInstapageListInfo.Add(new FbUserMessageInfo() { Message = Message });
+        //    }
+        //}
 
         public ObservableCollection<InstaInboxmember> GetInstaUserList(string userId)
         {

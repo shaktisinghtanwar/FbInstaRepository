@@ -82,7 +82,7 @@ namespace Fb_InstaWpf.Helper
                 reader.Close();
                 cnn.Close();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                
             }
@@ -149,7 +149,7 @@ namespace Fb_InstaWpf.Helper
             {
                 this.ExecuteNonQuery(String.Format("delete from {0} where {1};", tableName, where));
             }
-            catch (Exception fail)
+            catch (Exception)
             {
                 
                 returnCode = false;
@@ -172,7 +172,7 @@ namespace Fb_InstaWpf.Helper
             {
                 this.ExecuteNonQuery(String.Format("insert into {0}({1}) values({2});", tableName, columns, values));
             }
-            catch (Exception fail)
+            catch (Exception)
             {
                
                 returnCode = false;

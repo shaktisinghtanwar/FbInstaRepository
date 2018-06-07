@@ -126,7 +126,7 @@ namespace Fb_InstaWpf
                 }
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 //;

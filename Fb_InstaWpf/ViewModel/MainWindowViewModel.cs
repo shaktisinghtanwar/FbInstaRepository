@@ -5,18 +5,14 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
 using Fb_InstaWpf.Helper;
 using Fb_InstaWpf.Model;
-using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using HtmlAgilityPack;
-using System.IO;
 using System.Windows;
 using HtmlDocument = HtmlAgilityPack.HtmlDocument;
-using Keys = OpenQA.Selenium.Keys;
 using Microsoft.Win32;
 using System.Threading.Tasks;
 using System.Windows.Threading;
@@ -40,7 +36,6 @@ namespace Fb_InstaWpf.ViewModel
         public DelegateCommand TabCtrlLoaded { get; set; }
         public DelegateCommand Tab2CtrlLoaded { get; set; }
         public DelegateCommand Tab0CtrlLoaded { get; set; }
-        public DelegateCommand cmbUserLoaded { get; set; }
         public DelegateCommand ImageProgressBarLoaded { get; set; }
 
 
@@ -53,7 +48,7 @@ namespace Fb_InstaWpf.ViewModel
 
         public FacebookUserLoginInfo SelectedMainUser
         {
-            get {return  _selectedMainUser;} 
+            get { return _selectedMainUser; }
             set { _selectedMainUser = value; OnPropertyChanged(); }
         }
 
@@ -63,8 +58,7 @@ namespace Fb_InstaWpf.ViewModel
         DbHelper _dbHelper;
         OnlineFetcher _onlineFetcher;
         OnlinePoster _onlinePoster;
-      
-        //Thread printer;
+
 
         #region Contructor
         public MainWindowViewModel()
@@ -88,12 +82,10 @@ namespace Fb_InstaWpf.ViewModel
             FbPageInboxCommand = new DelegateCommand(FbPageInboxCommandHandler, null);
             SendimageCommand = new DelegateCommand(SendImageCommandHandler, null);
             SendimageFBCommand = new DelegateCommand(SendimageFBCommandHandler, null);
-            //
             SendFbCommentCommand = new DelegateCommand(SendFbCommentCommandHandler, null);
             TabCtrlLoaded = new DelegateCommand(TabCtrlLoadedCommandHandler, null);
             Tab2CtrlLoaded = new DelegateCommand(Tab2CtrlLoadedCommandHandler, null);
             Tab0CtrlLoaded = new DelegateCommand(Tab0CtrlLoadedCommandHandler, null);
-            //  cmbUserLoaded = new DelegateCommand(cmbUserLoadedHandler, null);
             ImageProgressBarLoaded = new DelegateCommand(ImageProgressBarLoadedCommandHandler, null);
             CloseTabCommand = new DelegateCommand(CloseTab);
 
@@ -105,11 +97,11 @@ namespace Fb_InstaWpf.ViewModel
 
             Task.Factory.StartNew(() => FillUserList());
 
-            //Task.Factory.StartNew(() => FillFacebookCmntList());
+            Messenger = "Messenger";
+            Facebook = "Facebook";
+            Instagram = "Instagram";
 
         }
-
-        
 
         private void FillUserList()
         {
@@ -119,64 +111,47 @@ namespace Fb_InstaWpf.ViewModel
                 LoginUsersList = data;
                 SelectedMainUser = data.FirstOrDefault();
                 Task.Factory.StartNew(() => ShowMessengerListData(SelectedMainUser));
-                
             });
-
-
         }
-
-
 
         private void ShowMessengerListData(FacebookUserLoginInfo user)
         {
             if (user == null) return;
-
             var data = _dbHelper.GetFbMessengerListData(user.UserId);
-
             Application.Current.Dispatcher.Invoke(() =>
             {
                 UserListInfo = data;
                 SelectedUserInfo = data.FirstOrDefault();
-            }          
-            );
-
+            });
         }
 
         private void ShowFbCommentListData(FacebookUserLoginInfo user)
         {
-           
             var data = _dbHelper.GetFacebookListData(user.UserId);
             Application.Current.Dispatcher.Invoke(() =>
             {
                 FbPageListmembers = data;
                 SelectedFBPageInfo = data.FirstOrDefault();
             });
-
-
         }
 
         private void ShowInstaListData(FacebookUserLoginInfo user)
         {
-
             var data = _dbHelper.GetInstaUserList(user.UserId);
             Application.Current.Dispatcher.Invoke(() =>
             {
-                InstaListmembers = data;
                 SelectedInstaInboxmemberInfo = data.FirstOrDefault();
+                InstaListmembers = data;
 
             });
-
-
         }
-
-
-
 
         private void SendMessageInstaCommandhandlar(object obj)
         {
-            MessagingInstapageListInfo.Add(new FbUserMessageInfo { UserType = 0, Message = FbInstaTextBxValue });
+            MessagingInstapageListInfo.Add(new FbUserMessageInfo { UserType = 0, Message = MessageToSend });
 
-            _dbHelper.Add(new PostMessage() { FromUserId = "", ImagePath = "", MessageType = MessageType.InstaMessage });
+            _dbHelper.Add(new PostMessage() { FromUserId = SelectedMainUser.UserId, ToUserId = SelectedFBPageInfo.Fbcomment_InboxUserId, ImagePath = MessageToSend, MessageType = MessageType.InstaMessage });
+            MessageToSend = string.Empty;
         }
 
         private void ImageProgressBarLoadedCommandHandler(object obj)
@@ -197,25 +172,31 @@ namespace Fb_InstaWpf.ViewModel
 
 
         private ObservableCollection<ImageLoginTextbox> _LoginImageInfo;
-        private ObservableCollection<FbpageInboxUserInfo> _userListInfo;
-        private ObservableCollection<FacebookPageInboxmember> _fbPageInboxmember;
-        private ObservableCollection<InstaInboxmember> _instaInboxmember;
-        private FbpageInboxUserInfo _selectedUserInfo;
-        private FacebookPageInboxmember _selectedFbPageInboxmember;
-        private InstaInboxmember _selectedInstaInboxmember;
-        private FacebookPageInboxmember SelectedFbPageInboxmember;
 
-        private int _messageIdount;
+        private ObservableCollection<FbpageInboxUserInfo> _userListInfo;
+
+        private ObservableCollection<FacebookPageInboxmember> _fbPageInboxmember;
+
+        private FbpageInboxUserInfo _selectedUserInfo;
+
+        private FacebookPageInboxmember _selectedFbPageInboxmember;
+
+        private InstaInboxmember _selectedInstaInboxmember;
+
         public string UrlName;
+
         private string _textcommet = string.Empty;
-        public string LstItemUserName { get; set; }
-        public string TextBxValue { get; set; }
-        public string Getimgurl { get; set; }
-        public string TemppageNodeItem { get; set; }
-        public string DataImg { get; set; }
+    
         public string PageSource { get; set; }
-        public string LstfbItemUserName { get; set; }
-        public string FbCommentTextBxValue { get; set; }
+
+        public string FbCommentTextBxValue
+        {
+            get => _fbCommentTextBxValue; set
+            {
+                _fbCommentTextBxValue = value;
+                OnPropertyChanged();
+            }
+        }
 
         public string currentURL { get; set; }
         private ObservableCollection<FbUserMessageInfo> messagingListInfo { get; set; }
@@ -229,13 +210,10 @@ namespace Fb_InstaWpf.ViewModel
         private readonly Queue<string> _queueUrl = new Queue<string>();
         private readonly Queue<string> _queueFbCmntImgUrl = new Queue<string>();
         private readonly Queue<string> _queueInstaImgUrl = new Queue<string>();
-        //private readonly Queue<string> _queueFbImgUrl = new Queue<string>();
         public List<String> LstPageUrl = new List<string>();
         public List<String> comboxList = new List<string>();
 
         public List<ListUsernameInfo> _MyListUsernameInfo = new List<ListUsernameInfo>();
-
-        // private string sqliteDatabase = @"Data Source=FbInstaCommentDb.s3db;";
 
         #endregion
 
@@ -243,10 +221,32 @@ namespace Fb_InstaWpf.ViewModel
         private ObservableCollection<UserMsgTabItem> userMsgTabItemList;
         public DelegateCommand CloseTabCommand { get; set; }
 
+        public string Messenger { get; set; }
+
+        public string Facebook { get; set; }
+
+        public string Instagram { get; set; }
+
         private void CloseTab(object obj)
         {
-            string tabName = obj.ToString();
-            UserMessengerTabItemList.Remove(UserMessengerTabItemList.FirstOrDefault(m => m.Header == tabName));
+            string[] array = obj.ToString().Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
+            string tabName = array[0];
+            string parentTabName = array[1];
+            switch (parentTabName)
+            {
+                case "Messenger":
+                    UserMessengerTabItemList.Remove(UserMessengerTabItemList.FirstOrDefault(m => m.Header == tabName));
+                    break;
+                case "Facebook":
+                    UserMsgTabItemListFb.Remove(UserMsgTabItemListFb.FirstOrDefault(m => m.HeaderFb == tabName));
+                    break;
+                case "Instagram":
+                    UserMsgTabItemListInsta.Remove(UserMsgTabItemListInsta.FirstOrDefault(m => m.HeaderInsta == tabName));
+                    break;
+
+                default:
+                    break;
+            }
         }
         public ObservableCollection<UserMsgTabItem> UserMessengerTabItemList
         {
@@ -443,11 +443,14 @@ namespace Fb_InstaWpf.ViewModel
         {
             _dbHelper.Add(new PostMessage()
             {
-                Message = TextBxValue,
+                FromUserId = SelectedMainUser.UserId,
+                ToUserId = SelectedFBPageInfo.Fbcomment_InboxUserId,
+                Message = MessageToSend,
                 MessageType = MessageType.FacebookImage,
                 // FromUserId = cmbUser.SelectedItem.ToString();
 
             });
+            MessageToSend = string.Empty;
         }
 
         private void Tab0CtrlLoadedCommandHandler(object obj)
@@ -471,25 +474,10 @@ namespace Fb_InstaWpf.ViewModel
 
         private void SendFbCommentCommandHandler(object obj)
         {
-            MessagingFbpageListInfo.Add(new FbUserMessageInfo { UserType = 0, Message = FbCommentTextBxValue });
-            //// string url = "https://www.facebook.com/TP-1996120520653285/inbox/?selected_item_id=1996233970641940";
-            ////    ChromeWebDriver.Navigate().GoToUrl(url);
-            //Thread.Sleep(2000);
-            //ReadOnlyCollection<IWebElement> postcomment = ChromeWebDriver.FindElements(By.XPath("//*[@class='UFICommentContainer']"));
-            //if (postcomment.Count > 0)
-            //{
-            //    postcomment[0].Click();
-            //    ReadOnlyCollection<IWebElement> postcomghghment = ChromeWebDriver.FindElements(By.XPath("//*[@class='notranslate _5rpu']"));
-            //    if (postcomghghment.Count > 0)
-            //    {
-            //        postcomghghment[0].SendKeys(FbCommentTextBxValue);
-            //        Thread.Sleep(1000);
-            //        postcomghghment[0].SendKeys(OpenQA.Selenium.Keys.Enter);
-            //    }
+            MessagingFbpageListInfo.Add(new FbUserMessageInfo { UserType = 0, Message = FbCommentTextBxValue });          
 
-            //}
-
-            _dbHelper.Add(new PostMessage() { FromUserId = SelectedMainUser.UserId, ToUserId = SelectedFBPageInfo.Fbcomment_InboxUserId, Message = FbCommentTextBxValue, MessageType = MessageType.FacebookMessage });
+            _dbHelper.Add(new PostMessage() { FromUserId = SelectedMainUser.UserId, ToUserId = SelectedFBPageInfo.Fbcomment_InboxUserId, Message = MessageToSend, MessageType = MessageType.FacebookMessage });
+            MessageToSend = string.Empty;
         }
 
         private void SendImageCommandHandler(object obj)
@@ -498,6 +486,8 @@ namespace Fb_InstaWpf.ViewModel
 
             PostMessage message = new PostMessage()
             {
+                FromUserId = SelectedMainUser.UserId,
+                ToUserId = SelectedFBPageInfo.Fbcomment_InboxUserId,
                 MessageType = MessageType.FacebookMessengerImage,
                 ImagePath = fileName,
             };
@@ -524,7 +514,7 @@ namespace Fb_InstaWpf.ViewModel
             {
                 Task.Factory.StartNew(() => ShowFbCommentListData(SelectedMainUser));
 
-               
+
                 // Showimage();
                 TabControl.SelectedIndex = Convert.ToInt16(obj);
 
@@ -537,7 +527,7 @@ namespace Fb_InstaWpf.ViewModel
 
         void fbTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-           // ShowFacebookListData();
+            // ShowFacebookListData();
             Application.Current.Dispatcher.Invoke(() =>
               Image.Visibility = Visibility.Hidden
             );
@@ -557,14 +547,14 @@ namespace Fb_InstaWpf.ViewModel
         private void IntaInboxCommandHandler(object obj)
         {
             // InstaTimer
-           
+
             TabControl.SelectedIndex = Convert.ToInt16(obj);
             Task.Factory.StartNew(() => ShowInstaListData(SelectedMainUser));
         }
 
-     
 
-       
+
+
 
 
         private void BIndFbPageData()
@@ -583,7 +573,7 @@ namespace Fb_InstaWpf.ViewModel
 
         private string fileName = Properties.Settings.Default.Filename;
         private DataTable dtuserCredential = new DataTable();
-      
+
         public System.Windows.Controls.Image Image { get; set; }
 
         public System.Windows.Controls.ComboBox cmbUser
@@ -596,11 +586,11 @@ namespace Fb_InstaWpf.ViewModel
         {
             _onlineFetcher.LoginWithSelenium();
 
-          
+
         }
 
         SqLiteHelper sql = new SqLiteHelper();
-      
+
 
         private void FbMessengerListCommandHandler(object obj)
         {
@@ -645,65 +635,39 @@ namespace Fb_InstaWpf.ViewModel
 
         private void BindUserMessage(FbpageInboxUserInfo fbpageInboxUserInfo)
         {
-            //Data Retrive
             MessagingListInfo = new ObservableCollection<FbUserMessageInfo>();
             if (!UserMessengerTabItemList.Any(m => m.Header.Equals(fbpageInboxUserInfo.InboxUserName)))
             {
                 UserMessengerTabItemList.Add(new UserMsgTabItem() { Header = fbpageInboxUserInfo.InboxUserName, MessagingListInfo = MessagingListInfo });
-                //printer.Start();
                 if (isLoggedIn)
                 {
                     GetUserChatBoxHistory();
                 }
                 else
                 {
-
                     BindUserInfo(fbpageInboxUserInfo.InboxUserId);
-
-                    // BindUserInfo();
-
                 }
-
             }
-
-
         }
 
         private void BindFBPageUserMessage(FacebookPageInboxmember selectedFBPageInfo)
         {
-            //Data Retrive
             try
             {
                 MessagingFbpageListInfo = new ObservableCollection<FbUserMessageInfo>();
                 if (!UserMsgTabItemListFb.Any(m => m.HeaderFb.Equals(selectedFBPageInfo.FbPageName)))
                 {
                     UserMsgTabItemListFb.Add(new UserMsgTabItem() { HeaderFb = selectedFBPageInfo.FbPageName, MessagingListInfo = MessagingFbpageListInfo });
-                   // MessagingFbpageListInfo=  _dbHelper.get();
-
-                    //if (isLoggedIn)
-                    //{
-                    // GetFacebookCommenter();
-                    //}
-                    //else
-                    //{
                     BindFbComments(selectedFBPageInfo.Fbcomment_InboxUserId);
-                    //}
                 }
-
             }
             catch (Exception)
             {
-
-                ;
             }
-
-
         }
 
         private void BindFbComments(string userId)
         {
-            //string query = "select Fbcomment_InboxUserId, from TblJobFb";
-
             string query = "select Fbcomment_InboxUserId,PlateformType,Message,ImageSource from TblJobFb where Fbcomment_InboxUserId='" + userId + "'";
 
             var dt = sql.GetDataTable(query);
@@ -712,7 +676,6 @@ namespace Fb_InstaWpf.ViewModel
 
                 string inboxUserId = Convert.ToString(item["Fbcomment_InboxUserId"]);
                 string PlateformType = Convert.ToString(item["PlateformType"]);
-                //string PostType = Convert.ToString(item["PostType"]);
                 string Message = Convert.ToString(item["Message"]);
                 string ImgSource = Convert.ToString(item["ImageSource"]);
                 if (PlateformType == "0")
@@ -724,13 +687,12 @@ namespace Fb_InstaWpf.ViewModel
                     messagingFbpageListInfo.Add(new FbUserMessageInfo { UserType = 1, Message = Message, otheruserFbimage = ImgSource });
                 }
 
-                messagingFbpageListInfo.Add(new FbUserMessageInfo { UserType = 0, Message = Message});
+                messagingFbpageListInfo.Add(new FbUserMessageInfo { UserType = 0, Message = Message });
             }
         }
 
         private void BindInstaUserMessage(InstaInboxmember SelectedInstaInboxmemberInfo)
         {
-
             MessagingInstapageListInfo = new ObservableCollection<FbUserMessageInfo>();
 
             if (!UserMsgTabItemListInsta.Any(m => m.HeaderInsta.Equals(SelectedInstaInboxmemberInfo.InstaInboxUserName)))
@@ -741,61 +703,36 @@ namespace Fb_InstaWpf.ViewModel
                     MessagingListInfo = MessagingInstapageListInfo
                 });
 
-                GetInstaCommenter(SelectedInstaInboxmemberInfo.Insta_inboxUserId);
+               // GetInstaCommenter(SelectedInstaInboxmemberInfo.Insta_inboxUserId);
             }
         }
 
-        private void GetInstaCommenter(string userId)
-        {
-            string query = "select Insta_inboxUserId,PlateformType,Message,ImageSource from TblJobFb where Fbcomment_InboxUserId='" + userId + "'";
-            var dt = sql.GetDataTable(query);
-            foreach (DataRow item in dt.Rows)
-            {
-                string InstainboxUserId = Convert.ToString(item["Insta_inboxUserId"]);
-                string PlateformType = Convert.ToString(item["PlateformType"]);
-                //string PostType = Convert.ToString(item["PostType"]);
-                string Message = Convert.ToString(item["Message"]);
-                string ImgSource = Convert.ToString(item["ImageSource"]);
+        //private void GetInstaCommenter(string userId)
+        //{
+        //    GetInstagramMessages(userId);
+        //}
+           
 
-                messagingInstapageListInfo.Add(new FbUserMessageInfo(){Message = Message});
-
-                //InstaListmembers.Add(new InstaInboxmember()
-                //{
-                //    Insta_inboxUserId = InstainboxUserId,
-                //    //InstaInboxUserName = Insta_inboxUserName,
-                //    //InstaInboxUserImage = Insta_inboxUserImage,
-                //    //InstaInboxNavigationUrl = InstaInboxNavigationUrl
-
-                       
-                //    });
-                
-            }
-        }
-
-
-        public string msgId { get; set; }
         string PlateformType = "1";
         string PostType = "1";
-        string ImgSource = "1";
         string Status = "1";
         bool isLoggedIn = false;
         private ObservableCollection<FacebookUserLoginInfo> _loginUsersList;
         private FacebookUserLoginInfo _selectedMainUser;
+        private string _fbCommentTextBxValue;
+        private string _messageToSend;
+        private ObservableCollection<InstaInboxmember> _instaInboxmember;
 
         public void GetUserChatBoxHistory()
         {
             try
             {
-                //ShowMessengerListData();
                 if (isLoggedIn)
                     GetUserChatBoxDataOnline();
             }
             catch (Exception)
             {
-                ;
             }
-
-
         }
 
         private void GetUserChatBoxDataOnline()
@@ -811,7 +748,7 @@ namespace Fb_InstaWpf.ViewModel
             {
                 currentURL = ChromeWebDriver.Url;
                 var tempId = currentURL.Split('?')[1].Split('=')[1];
-               
+
                 HtmlNode selectSingleNode = htmlNodeDiv.SelectSingleNode(".//*[@class='clearfix _o46 _3erg _29_7 direction_ltr text_align_ltr']");
 
                 if (selectSingleNode != null)
@@ -821,8 +758,6 @@ namespace Fb_InstaWpf.ViewModel
                     string query = "INSERT INTO TblJob(M_InboxUserId,PlateformType,PostType,Message,ImgSource,Status) values('" + tempId + "','" + PlateformType + "','" + 0 + "','" + otheruser + "','" + imagesrc + "','" + Status + "')";
                     SqLiteHelper sql = new SqLiteHelper();
                     int yy = sql.ExecuteNonQuery(query);
-
-
                 }
 
                 HtmlNode selectSingleimgNode = htmlNodeDiv.SelectSingleNode(".//*[@class='clearfix _o46 _3erg _29_7 direction_ltr text_align_ltr _ylc']");
@@ -876,48 +811,35 @@ namespace Fb_InstaWpf.ViewModel
             }
         }
 
-        //private void TimeRefreshchatBox_Tick(object sender, System.Timers.ElapsedEventArgs e)
-        //{
-        //    string query1 = "select Count(*) from TblJob where Message='" + chat + "'and ImgSource='" + imagesrc + "'";
-        //    sql.ExecuteScalar(query1);
-        //}
-
-    
-
         public void SendMessageCommandHandler(object j)
         {
-           _dbHelper.Add(new PostMessage() { FromUserId = SelectedMainUser.UserId, ToUserId = SelectedUserInfo.InboxUserId, Message = TextBxValue, MessageType = MessageType.FacebookMessage });
-
-        }
-
-
+            _dbHelper.Add(new PostMessage() { FromUserId = SelectedMainUser.UserId, ToUserId = SelectedUserInfo.InboxUserId, Message = MessageToSend, MessageType = MessageType.FacebookMessage });
+            MessageToSend = string.Empty;
+        }       
 
         #endregion
-        
+
         public string chat { get; set; }
 
         public string imagesrc { get; set; }
 
         public string otherimagesrc { get; set; }
 
-        public string chatInsta { get; set; }
-
-        public string imagesrcInsta { get; set; }
-
-        public string chatFb { get; set; }
-
-        public string imagesrcFb { get; set; }
-
         public ChromeDriver ChromeWebDriver { get; set; }
 
-        public string FbInstaTextBxValue { get; set; }
-        public ObservableCollection<InstaInboxmember> InstaInboxmember 
-        { get {return InstaInboxmember1; } 
-          set{InstaInboxmember1 = value;} 
+        public ObservableCollection<InstaInboxmember> InstaInboxmember
+        {
+            get { return _instaInboxmember; }
+            set { _instaInboxmember = value; }
         }
-        public ObservableCollection<InstaInboxmember> InstaInboxmember1 
-        { get {return _instaInboxmember; }
-          set { _instaInboxmember = value; }
+
+        public string MessageToSend {
+            get => _messageToSend;
+            set
+            {
+                _messageToSend = value;
+                OnPropertyChanged();
+            }
         }
     }
 }

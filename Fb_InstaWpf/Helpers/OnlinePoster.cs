@@ -10,7 +10,6 @@ namespace Fb_InstaWpf
     public class OnlinePoster
     {
         ConcurrentQueue<PostMessage> _producerConsumerCollection;
-        DbHelper _dbHelper;
 
         public OnlinePoster()
         {
@@ -18,7 +17,6 @@ namespace Fb_InstaWpf
 
             RestartThread();
         }
-
       
         public void ProcessMessage()
         {
@@ -102,7 +100,7 @@ namespace Fb_InstaWpf
                     Thread.Sleep(2000);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
