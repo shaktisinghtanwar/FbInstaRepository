@@ -1,19 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
 using Fb_InstaWpf.Helper;
 using Fb_InstaWpf.Model;
-using OpenQA.Selenium.Chrome;
 using System.Windows;
-using HtmlDocument = HtmlAgilityPack.HtmlDocument;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using Fb_InstaWpf.DbModel;
-using Fb_InstaWpf.Enums;
 
 namespace Fb_InstaWpf.ViewModel
 {
@@ -51,7 +45,6 @@ namespace Fb_InstaWpf.ViewModel
                     _loginUser = value;
                     OnPropertyChanged();
                 }
-            
             }
         }
 
@@ -60,7 +53,6 @@ namespace Fb_InstaWpf.ViewModel
             get { return _loginUsersList; }
             set { _loginUsersList = value; OnPropertyChanged(); }
         }
-
 
         public SocialTabViewModel MessengerUserListViewModel
         {
@@ -86,11 +78,7 @@ namespace Fb_InstaWpf.ViewModel
         #region Contructor
         public MainWindowViewModel()
         {
-           // InstagramUserListViewModel = new SocialTabViewModel(Enums.TabType.Instagram);
-           // FacebookUserListViewModel = new SocialTabViewModel(Enums.TabType.Facebook);
-
             LoginImageInfo = new ObservableCollection<ImageLoginTextbox>();
-
             LoginCommand = new DelegateCommand(LoginCommandHandler, null);
             FbMessengerListCommand = new DelegateCommand(LeftFbMessengerListCommandHandler, null);
             InstaInboxCommand = new DelegateCommand(LeftInstaInboxCommandHandler, null);
@@ -99,7 +87,6 @@ namespace Fb_InstaWpf.ViewModel
             ImageProgressBarLoaded = new DelegateCommand(ImageProgressBarLoadedCommandHandler, null);
             CloseTabCommand = new DelegateCommand(CloseTab);
 
-            CreateColumn();
             _databaseContext = new DatabaseContext();
             _onlineFetcher = new OnlineFetcher();
             _onlinePoster = new OnlinePoster();
@@ -220,12 +207,6 @@ namespace Fb_InstaWpf.ViewModel
             Image.Visibility = Visibility.Visible;
         }
 
-        void CreateColumn()
-        {
-            dtuserCredential.Columns.Add("UserName");
-            dtuserCredential.Columns.Add("Password");
-        }
-
         #endregion
 
         #region Field
@@ -243,8 +224,6 @@ namespace Fb_InstaWpf.ViewModel
         #endregion
 
         #region Property
-
-    
 
         #region User Info Details
 
@@ -273,10 +252,7 @@ namespace Fb_InstaWpf.ViewModel
             Image.Visibility = Visibility.Visible;
         }
 
-  
-
         private string fileName = Properties.Settings.Default.Filename;
-        private DataTable dtuserCredential = new DataTable();
 
         public System.Windows.Controls.Image Image { get; set; }
 
@@ -301,9 +277,7 @@ namespace Fb_InstaWpf.ViewModel
         public string imagesrc { get; set; }
 
         public string otherimagesrc { get; set; }
-
-        public ChromeDriver ChromeWebDriver { get; set; }
-
+  
         public string MessageToSend
         {
             get => _messageToSend;

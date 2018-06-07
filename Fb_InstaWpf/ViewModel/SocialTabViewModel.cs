@@ -37,7 +37,6 @@ namespace Fb_InstaWpf.ViewModel
                 _selectedUserInfo = value;
                 if ( _selectedUserInfo !=null)
                     BindUserMessage(_selectedUserInfo);
-                //_pubSubEvent.Publish(value);
                 OnPropertyChanged();
             }
         }
@@ -158,8 +157,6 @@ namespace Fb_InstaWpf.ViewModel
 
         private void SendMessageInstaCommandhandlar(object obj)
         {
-            //Messages.Add(new FbUserMessageInfo { UserType = 0, Message = MessageToSend });
-
             _dbHelper.Add(new PostMessage()
             {
                 FromUserId = LoginUser.InboxUserId,
@@ -173,7 +170,6 @@ namespace Fb_InstaWpf.ViewModel
         public void SendMessageCommandHandler(object message)
         {
             _dbHelper.Add(new PostMessage() { FromUserId = LoginUser.InboxUserId, ToUserId = SelectedItem.InboxUserId, Message = message.ToString(), MessageType = MessageType.FacebookMessage });
-            //MessageToSend = string.Empty;
         }
         private void SendimageFBCommandHandler(object obj)
         {
@@ -183,15 +179,11 @@ namespace Fb_InstaWpf.ViewModel
                 ToUserId = ActiveTabUser.InboxUserId,
                 Message = MessageToSend,
                 MessageType = MessageType.FacebookImage,
-                // FromUserId = cmbUser.SelectedItem.ToString();
-
             });
             MessageToSend = string.Empty;
         }
         private void SendFbCommentCommandHandler(object obj)
         {
-           // MessagingFbpageListInfo.Add(new FbUserMessageInfo { UserType = 0, Message = FbCommentTextBxValue });
-
             _dbHelper.Add(new PostMessage()
             {
                 FromUserId = LoginUser.InboxUserId,
@@ -208,50 +200,6 @@ namespace Fb_InstaWpf.ViewModel
                 SelectedUsers.Add(fbpageInboxUserInfo);
                 fbpageInboxUserInfo.Messages = _dbHelper.GetMessengerUserComments(fbpageInboxUserInfo.InboxUserId);
             }
-
-            //if ( fbpageInboxUserInfo.MessageUserType == Model.PlatformType.FacebookMessenger.ToString())
-            //{
-            //    if (!SelectedUsers.Any(m => m.InboxUserName.Equals(fbpageInboxUserInfo.InboxUserName)))
-            //    {
-            //        SelectedUsers.Add(fbpageInboxUserInfo);
-            //        fbpageInboxUserInfo.Messages = _dbHelper.GetMessengerUserComments(fbpageInboxUserInfo.InboxUserId);
-            //    }
-            //}
-            //else if (fbpageInboxUserInfo.MessageUserType == Model.PlatformType.FacebookPage.ToString())
-            //{
-            //    if (!SelectedUsers.Any(m => m.InboxUserName.Equals(fbpageInboxUserInfo.InboxUserName)))
-            //    {
-            //        SelectedUsers.Add(fbpageInboxUserInfo);
-            //        fbpageInboxUserInfo.Messages = _dbHelper.GetMessengerUserComments(fbpageInboxUserInfo.InboxUserId);
-            //    }
-            //}
-            //else if (fbpageInboxUserInfo.MessageUserType == Model.PlatformType.Instagram.ToString())
-            //{
-            //    if (!SelectedUsers.Any(m => m.InboxUserName.Equals(fbpageInboxUserInfo.InboxUserName)))
-            //    {
-            //        SelectedUsers.Add(fbpageInboxUserInfo);
-            //        fbpageInboxUserInfo.Messages = _dbHelper.GetMessengerUserComments(fbpageInboxUserInfo.InboxUserId);
-            //    }
-            //}
         }
-
-
-        //private void BindFBPageUserMessage(SocialUser selectedFBPageInfo)
-        //{
-        //    try
-        //    {
-        //        MessagingFbpageListInfo = new ObservableCollection<FbUserMessageInfo>();
-        //        if (!UserMsgTabItemListFb.Any(m => m.Header.Equals(selectedFBPageInfo.InboxUserName)))
-        //        {
-        //            UserMsgTabItemListFb.Add(new UserMsgTabItem() { Header = selectedFBPageInfo.InboxUserName, MessagingListInfo = MessagingFbpageListInfo });
-        //            BindFbComments(selectedFBPageInfo.InboxUserId);
-        //        }
-        //    }
-        //    catch (Exception)
-        //    {
-        //    }
-        //}
-
-    
     }
 }
