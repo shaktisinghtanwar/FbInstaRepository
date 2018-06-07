@@ -15,6 +15,8 @@
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <NuGetPackageImportStamp>5fc94e32</NuGetPackageImportStamp>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">.\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -124,6 +126,11 @@
     <Compile Include="AddLoginUsers.xaml.cs">
       <DependentUpon>AddLoginUsers.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\DbHelper.cs" />
+    <Compile Include="Helpers\MessageType.cs" />
+    <Compile Include="Helpers\OnlineFetcher.cs" />
+    <Compile Include="Helpers\OnlinePoster.cs" />
+    <Compile Include="Helpers\PostMessage.cs" />
     <Compile Include="Helper\DelegateCommand.cs" />
     <Compile Include="Helper\FileOperation.cs" />
     <Compile Include="Helper\MessageDataTemplateSelector.cs" />
@@ -133,7 +140,6 @@
     <Compile Include="Model\FBUserMessageInfocs.cs" />
     <Compile Include="Model\MasterViewModel.cs" />
     <Compile Include="Model\RequestModel.cs" />
-    <Compile Include="OnlinePoster.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="UpdateMyDelegatedelegate.cs" />
     <Compile Include="UpdateMyDelegatedelegate_2.cs" />
@@ -189,7 +195,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="UserInboxImages\" />
     <Folder Include="View\" />
   </ItemGroup>
   <ItemGroup>
@@ -202,6 +207,9 @@
     <Resource Include="Images\downloasmileSticker.png" />
     <Resource Include="Images\download.jpg" />
     <Resource Include="Images\GrayBar.gif" />
+    <Content Include="Chromedriver\chromedriver.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Lib\System.Data.SQLite.dll" />
     <Resource Include="Images\if_comment_facebook_92596.png" />
     <Resource Include="Images\if_Facebook_Messenger_1298720.png" />
@@ -220,8 +228,10 @@
     </PropertyGroup>
     <Error Condition="!Exists('.\packages\Selenium.Chrome.WebDriver.2.38\build\Selenium.Chrome.WebDriver.targets')" Text="$([System.String]::Format('$(ErrorText)', '.\packages\Selenium.Chrome.WebDriver.2.38\build\Selenium.Chrome.WebDriver.targets'))" />
     <Error Condition="!Exists('packages\System.Data.SQLite.Core.1.0.108.0\build\net46\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\System.Data.SQLite.Core.1.0.108.0\build\net46\System.Data.SQLite.Core.targets'))" />
+    <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
   </Target>
   <Import Project="packages\System.Data.SQLite.Core.1.0.108.0\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('packages\System.Data.SQLite.Core.1.0.108.0\build\net46\System.Data.SQLite.Core.targets')" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
