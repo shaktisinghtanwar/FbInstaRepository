@@ -56,7 +56,7 @@ namespace Fb_InstaWpf.ViewModel
 
         public SocialTabViewModel MessengerUserListViewModel
         {
-            get => _messengerUserListViewModel;
+            get {return _messengerUserListViewModel;}
             set
             {
                 _messengerUserListViewModel = value;
@@ -91,7 +91,7 @@ namespace Fb_InstaWpf.ViewModel
             _onlineFetcher = new OnlineFetcher();
             _onlinePoster = new OnlinePoster();
             _dbHelper = new DbHelper();
-
+            
             Task.Factory.StartNew(() => FillLoginUserList());
         }
 
@@ -105,7 +105,7 @@ namespace Fb_InstaWpf.ViewModel
             });
         }
 
-        private void LeftFbMessengerListCommandHandler(object obj)
+        public void LeftFbMessengerListCommandHandler(object obj)
         {
             TabControlSelectedIndex = Convert.ToInt16(obj);
             if (MessengerUserListViewModel == null)
@@ -126,7 +126,7 @@ namespace Fb_InstaWpf.ViewModel
 
         private void LeftMessengerData()
         {
-            var data = _dbHelper.GetFbMessengerListData(LoginUser.UserId);
+            var data = _dbHelper.GetLeftMessengerListData(LoginUser.UserId);
 
             Application.Current.Dispatcher.Invoke(() =>
             {
@@ -141,7 +141,8 @@ namespace Fb_InstaWpf.ViewModel
 
         private void LeftFacebookData()
         {
-            var data = _dbHelper.GetFacebookListData(LoginUser.UserId);
+            var data = _dbHelper.GetLeftMessengerListData(LoginUser.UserId);
+           // var data = _dbHelper.GetFacebookListData(LoginUser.UserId);
             Application.Current.Dispatcher.Invoke(() =>
             {
                 FacebookUserListViewModel = FacebookUserListViewModel ?? new SocialTabViewModel(Enums.TabType.Facebook)
@@ -155,7 +156,8 @@ namespace Fb_InstaWpf.ViewModel
 
         private void LeftInstagramData()
         {
-            var data = _dbHelper.GetInstaUserList(LoginUser.UserId);
+            //var data = _dbHelper.GetInstaUserList(LoginUser.UserId);
+             var data = _dbHelper.GetLeftMessengerListData(LoginUser.UserId);
             Application.Current.Dispatcher.Invoke(() =>
             {
                 InstagramUserListViewModel = InstagramUserListViewModel ?? new SocialTabViewModel(Enums.TabType.Instagram)
@@ -280,7 +282,7 @@ namespace Fb_InstaWpf.ViewModel
   
         public string MessageToSend
         {
-            get => _messageToSend;
+            get {return _messageToSend;}
             set
             {
                 _messageToSend = value;
@@ -290,7 +292,7 @@ namespace Fb_InstaWpf.ViewModel
 
         public int TabControlSelectedIndex
         {
-            get => _tabControlSelectedIndex;
+            get { return _tabControlSelectedIndex; }
             set
             {
                 _tabControlSelectedIndex = value;

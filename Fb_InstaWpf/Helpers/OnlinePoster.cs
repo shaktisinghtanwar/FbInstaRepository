@@ -71,12 +71,13 @@ namespace Fb_InstaWpf
         {
             return new ChromeDriver();
         }
-        public  bool TryPostMessageToFacebook(PostMessage message)
+
+        public bool TryPostMessageToFBMessenger(PostMessage message)
         {
             try
             {
-                var ChromeWebDriver = GetDriver();
-                ChromeWebDriver.Navigate().GoToUrl("https://www.facebook.com/TP-1996120520653285/inbox/?selected_item_id=100002948674558");
+                 var ChromeWebDriver = GetDriver();
+                ChromeWebDriver.Navigate().GoToUrl("https://www.facebook.com/TP-1996120520653285/inbox/?selected_item_id=100002324267540");
                 Thread.Sleep(2000);
                 //  ChromeWebDriver.Navigate().GoToUrl("https://www.facebook.com/pages/?category=your_pages");
                 string pageSource = ChromeWebDriver.PageSource;
@@ -107,7 +108,29 @@ namespace Fb_InstaWpf
             return false;
         }
 
-        public  bool TryPostImageToFacebook(PostMessage message)
+        public bool TryPostImageToFBMessenger(PostMessage message)
+        {
+            var ChromeWebDriver = GetDriver();
+            //string url = "https://www.facebook.com/TP-1996120520653285/inbox/?selected_item_id=100002324267540";
+            //ChromeWebDriver.Navigate().GoToUrl(url);
+            ReadOnlyCollection<IWebElement> emailElement = ChromeWebDriver.FindElements(By.ClassName("_4dvy"));
+            if (emailElement.Count > 0)
+            {
+                emailElement[0].Click();
+            }
+            Thread.Sleep(7000);
+
+            ReadOnlyCollection<IWebElement> sendimage = ChromeWebDriver.FindElements(By.ClassName("_4dw3"));
+            if (sendimage.Count > 0)
+            {
+                Thread.Sleep(3000);
+                sendimage[0].Click();
+                Thread.Sleep(3000);
+            }
+            return false;
+        }
+
+        public bool TryPostImageToFacebook(PostMessage message)
         {
             try
             {
@@ -118,7 +141,7 @@ namespace Fb_InstaWpf
                     emailElement1[0].Click();
 
                 }
-                Thread.Sleep(3000);
+                Thread.Sleep(7000);
 
                 ReadOnlyCollection<IWebElement> sendimage = ChromeWebDriver.FindElements(By.XPath(".//span[@data-testid='ufi_photo_preview_test_id']"));
                 if (sendimage.Count > 0)
@@ -136,10 +159,11 @@ namespace Fb_InstaWpf
             return false;
         }
 
-        public  bool TryPostMessageToInsta(PostMessage message)
+
+        public bool TryPostMessageToFacebook(PostMessage message)
         {
             var ChromeWebDriver = GetDriver();
-           
+
             // string url = "https://www.facebook.com/TP-1996120520653285/inbox/?selected_item_id=1996233970641940";
             //    ChromeWebDriver.Navigate().GoToUrl(url);
             Thread.Sleep(2000);
@@ -159,30 +183,27 @@ namespace Fb_InstaWpf
             return false;
         }
 
-        public  bool TryPostMessageToFBMessenger(PostMessage message)
+        public bool TryPostMessageToInsta(PostMessage message)
         {
             var ChromeWebDriver = GetDriver();
-            ReadOnlyCollection<IWebElement> emailElement = ChromeWebDriver.FindElements(By.ClassName("_4dvy"));
+            //string url = "https://www.facebook.com/TP-1996120520653285/inbox/?selected_item_id=1996142927317711";
+            //_chromeWebDriver.Navigate().GoToUrl(url);
+            Thread.Sleep(3000);
+            var emailElement = ChromeWebDriver.FindElements(By.XPath("//input[@class='_58al']"));
             if (emailElement.Count > 0)
             {
-                emailElement[0].Click();
+                Thread.Sleep(3000);
+                emailElement[0].SendKeys("hiiii");
             }
             Thread.Sleep(3000);
-
-            ReadOnlyCollection<IWebElement> sendimage = ChromeWebDriver.FindElements(By.ClassName("_4dw3"));
-            if (sendimage.Count > 0)
+            var sendmessage = ChromeWebDriver.FindElements(By.XPath("//div[@class='_1fn8 _45dg']"));
+            //ReadOnlyCollection<IWebElement> sendmessage = _chromeWebDriver.FindElements(By.ClassName("input"));
+            if (sendmessage.Count > 0)
             {
-                Thread.Sleep(3000);
-                sendimage[0].Click();
-                Thread.Sleep(3000);
+                sendmessage[0].Click();
             }
-            return false;
+            return true;
         }
-        public  bool TryPostImageToFBMessenger(PostMessage message)
-        {
-            return false;
-        }
-
 
     }
 }

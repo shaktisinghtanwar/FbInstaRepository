@@ -29,7 +29,7 @@ namespace Fb_InstaWpf.Model
 
         public string InboxUserId
         {
-            get => _inboxUserId;
+            get {return _inboxUserId;}
             set
             {
                 _inboxUserId = value;
@@ -40,7 +40,7 @@ namespace Fb_InstaWpf.Model
 
         public string InboxUserImage
         {
-            get => _inboxUserImage;
+            get{return _inboxUserImage;}
             set
             {
                 _inboxUserImage = value;
@@ -50,7 +50,7 @@ namespace Fb_InstaWpf.Model
 
         public string InboxUserName
         {
-            get => _inboxUserName;
+            get {return _inboxUserName;} 
             set
             {
                 _inboxUserName = value;
@@ -59,7 +59,7 @@ namespace Fb_InstaWpf.Model
         }
         public string InboxNavigationUrl
         {
-            get => _inboxNavigationUrl;
+            get {return _inboxNavigationUrl;}
             set
             {
                 _inboxNavigationUrl = value;
@@ -68,7 +68,7 @@ namespace Fb_InstaWpf.Model
         }
 
         public ObservableCollection<FbUserMessageInfo> Messages {
-            get => _messages;
+            get {return _messages;}
             set
             {
                 _messages = value;
@@ -78,7 +78,7 @@ namespace Fb_InstaWpf.Model
 
         public string MessageUserType
         {
-            get => _messageUserType;
+            get { return _messageUserType; }
             set
             {
                 _messageUserType = value;

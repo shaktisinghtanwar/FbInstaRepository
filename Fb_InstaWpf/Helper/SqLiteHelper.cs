@@ -13,7 +13,8 @@ namespace Fb_InstaWpf.Helper
 {
     class SqLiteHelper
     {
-        string appStartupPath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/DBFbInstaComment/FbInstaCommentDb.s3db";
+        //string appStartupPath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/DBFbInstaComment/FbInstaCommentDb.s3db";
+                string appStartupPath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/DBFbInstaComment/Facebookdb.db";
         public String DbConnection { get; set; }
         /// <summary>
         ///     Default Constructor for SQLiteDatabase Class.

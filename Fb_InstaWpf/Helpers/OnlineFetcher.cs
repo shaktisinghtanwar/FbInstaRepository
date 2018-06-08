@@ -30,7 +30,7 @@ namespace Fb_InstaWpf
         private readonly Queue<string> _queueFbCmntImgUrl = new Queue<string>();
         
         DbHelper _dbHelper;
-
+        public bool isLoggedIn = false;
         public void LoginWithSelenium()
          {
             try
@@ -119,7 +119,7 @@ namespace Fb_InstaWpf
                     GetFbMessengerMessages();
                     Thread.Sleep(2000);
                     MessageBox.Show("Login Successful.......!");
-                    //isLoggedIn = true;
+                    isLoggedIn = true;
                     Thread.Sleep(2000);
 
                    // Image.Visibility = Visibility.Hidden;
@@ -314,20 +314,20 @@ namespace Fb_InstaWpf
         }
 
 
-        private void GetFacebookCommenter(string navigationUrl)
+        private void GetFacebookCommenter()
         {
             List<FbUserMessageInfo> messagingFbpageListInfo = null;
             try
             {
-                var chromeWebDriver = GetDriver();
-                // chromeWebDriver.Navigate().GoToUrl(SelectedFBPageInfo.FBInboxNavigationUrl);
-                chromeWebDriver.Navigate().GoToUrl(navigationUrl);
+                //  var chromeWebDriver = GetDriver();
+                // chromeWebDriver.Navigate().GoToUrl(SelectedFBPageInfo.FBInboxNavigationUrl); navigationUrl string FBInboxNavigationUrl
+                ChromeWebDriver.Navigate().GoToUrl("https://www.facebook.com/TP-1996120520653285/inbox/?selected_item_id=1996233970641940");
 
                 Thread.Sleep(3000);
-                var pageSource = chromeWebDriver.PageSource;
+                var pageSource = ChromeWebDriver.PageSource;
                 var htmlDocument = new HtmlDocument();
                 htmlDocument.LoadHtml(pageSource);
-                Thread.Sleep(3000);
+                Thread.Sleep(1000);
                 HtmlNodeCollection commentNode = htmlDocument.DocumentNode.SelectNodes("//div[@class='_5v3q _5jmm _5pat _11m5']");
                 messagingFbpageListInfo = new List<FbUserMessageInfo>();
                 foreach (HtmlNode htmlcommentNode in commentNode)
@@ -468,6 +468,52 @@ namespace Fb_InstaWpf
             //        int yy = sql.ExecuteNonQuery(query);
             //    }
             //}
+        }
+
+
+
+        private void GetInstagramComment()
+        {
+            List<FbUserMessageInfo> messagingFbpageListInfo = null;
+            try
+            {
+                // var chromeWebDriver = GetDriver();
+                // chromeWebDriver.Navigate().GoToUrl(SelectedFBPageInfo.FBInboxNavigationUrl); navigationUrl
+                ChromeWebDriver.Navigate().GoToUrl("https://www.facebook.com/TP-1996120520653285/inbox/?selected_item_id=1996142970651040");
+
+                Thread.Sleep(3000);
+                var pageSource = ChromeWebDriver.PageSource;
+                var htmlDocument = new HtmlDocument();
+                htmlDocument.LoadHtml(pageSource);
+                Thread.Sleep(1000);
+                HtmlNodeCollection commentNode = htmlDocument.DocumentNode.SelectNodes("//div[@class='_4cye _4-u2  _4-u8']");
+                messagingFbpageListInfo = new List<FbUserMessageInfo>();
+                foreach (HtmlNode htmlcommentNode in commentNode)
+                {
+                    HtmlNode selectNode = htmlcommentNode.SelectSingleNode("//div[@class='_4cyh']");
+                    var pagename = selectNode.InnerText;
+                    messagingFbpageListInfo.Add(new FbUserMessageInfo { UserType = 0, Message = pagename });
+
+                    HtmlNode pageimg = htmlcommentNode.SelectSingleNode("//img[@class='img']");
+
+                    var imgsrc = pageimg.Attributes["src"].Value.Replace(";", "&");
+                    messagingFbpageListInfo.Add(new FbUserMessageInfo { UserType = 3, loginguserFbimage = imgsrc });
+                }
+
+                HtmlNodeCollection commentBlock = htmlDocument.DocumentNode.SelectNodes("//div[@class='_3i4- _5aj7']");
+                var commentImg = string.Empty;
+                foreach (HtmlNode commentitem in commentBlock)
+                {
+
+                    var usernameAndComment = commentitem.InnerText.Split();
+                    var ccomment = usernameAndComment[0];
+                }
+
+            }
+            catch (Exception)
+            {
+
+            }
         }
     }
 }

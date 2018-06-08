@@ -19,6 +19,7 @@ namespace Fb_InstaWpf.ViewModel
         private SocialUser _selectedUserInfo;
 
         private SocialUser _activeTabUserInfo;
+        OnlineFetcher _OnlineFetcher;
 
         private ObservableCollection<SocialUser> _selectedUsers;
 
@@ -31,7 +32,7 @@ namespace Fb_InstaWpf.ViewModel
         
         public SocialUser SelectedItem
         {
-            get => _selectedUserInfo;
+            get {return _selectedUserInfo;}
             set
             {
                 _selectedUserInfo = value;
@@ -43,7 +44,7 @@ namespace Fb_InstaWpf.ViewModel
 
         public ObservableCollection<SocialUser> UserListInfo
         {
-            get => _userListInfo;
+            get {return _userListInfo;}
             set
             {
                 _userListInfo = value;
@@ -53,7 +54,7 @@ namespace Fb_InstaWpf.ViewModel
 
         public ObservableCollection<SocialUser> SelectedUsers
         {
-            get => _selectedUsers;
+            get {return  _selectedUsers;}
             set
             {
                 _selectedUsers = value;
@@ -63,7 +64,7 @@ namespace Fb_InstaWpf.ViewModel
 
         public SocialUser ActiveTabUser
         {
-            get => _activeTabUserInfo;
+            get {return _activeTabUserInfo;}
             set
             {
                 _activeTabUserInfo = value;
@@ -79,7 +80,7 @@ namespace Fb_InstaWpf.ViewModel
 
         public SocialUser LoginUser
         {
-            get => _loginUser;
+            get {return _loginUser;}
             set
             {
                 _loginUser = value;
@@ -89,7 +90,7 @@ namespace Fb_InstaWpf.ViewModel
 
         public string MessageToSend
         {
-            get => _messageToSend;
+            get {return _messageToSend;}
             set
             {
                 _messageToSend = value;
@@ -99,7 +100,7 @@ namespace Fb_InstaWpf.ViewModel
 
         public string TabType
         {
-            get => _tabType;
+            get { return _tabType; }
             set
             {
                 _tabType = value;
@@ -169,6 +170,10 @@ namespace Fb_InstaWpf.ViewModel
 
         public void SendMessageCommandHandler(object message)
         {
+
+
+
+
             _dbHelper.Add(new PostMessage() { FromUserId = LoginUser.InboxUserId, ToUserId = SelectedItem.InboxUserId, Message = message.ToString(), MessageType = MessageType.FacebookMessage });
         }
         private void SendimageFBCommandHandler(object obj)
@@ -193,12 +198,21 @@ namespace Fb_InstaWpf.ViewModel
             });
             MessageToSend = string.Empty;
         }
+
         private void BindUserMessage(SocialUser fbpageInboxUserInfo)
         {
             if (!SelectedUsers.Any(m => m.InboxUserName.Equals(fbpageInboxUserInfo.InboxUserName)))
             {
                 SelectedUsers.Add(fbpageInboxUserInfo);
-                fbpageInboxUserInfo.Messages = _dbHelper.GetMessengerUserComments(fbpageInboxUserInfo.InboxUserId);
+                if (_OnlineFetcher.isLoggedIn)
+                {
+                    ////For Messanger Message Method
+                }
+                else
+                {
+                    fbpageInboxUserInfo.Messages = _dbHelper.GetMessengerUserComments(fbpageInboxUserInfo.InboxUserId);
+                }
+               
             }
         }
     }

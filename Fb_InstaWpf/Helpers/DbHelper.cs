@@ -38,12 +38,13 @@ namespace Fb_InstaWpf
            // var usersList = _databaseContext.Users.ToList();
 
             var sql = GetSqliteHelper();
-            string query = "select * from TBLLogin";
+            //string query = "select * from TBLLogin";
+            string query = "select * from Users";
             var dt = sql.GetDataTable(query);
             ObservableCollection<FacebookUserLoginInfo> users = new ObservableCollection<FacebookUserLoginInfo>();
             foreach (DataRow row in dt.Rows)
             {
-                users.Add(new FacebookUserLoginInfo() { LoginUserName = row[1].ToString(), UserId = row[0].ToString(), Password = row[2].ToString() });
+                users.Add(new FacebookUserLoginInfo() { LoginUserName = row[1].ToString(), UserId = row[3].ToString(), Password = row[2].ToString() });
             }
             return users;
         }
@@ -71,15 +72,17 @@ namespace Fb_InstaWpf
                 var sql = GetSqliteHelper();
                 var sql1 = GetSqliteHelper();
 
-                string query1 = "select Count(*) from TblMessengerList where M_InboxUserId='" + listUsernameInfo.ListUserId + "'";
+                string query1 = "select Count(*) from FacebookUsers where FacebookId='" + listUsernameInfo.ListUserId + "'";
 
                 int count = Convert.ToInt32(sql1.ExecuteScalar(query1));
                 if (count == 0)
                 {
                     string query =
-                        "INSERT INTO TblMessengerList(M_InboxUserId,M_inboxUserName,M_InboxUserImage,M_InboxNavigationUrl,Status) values('" +
+                        "INSERT INTO FacebookUsers(FacebookId,DisplayName,ImageUrl,NavigationUrl,JobType,Parent_User_Id) values('" +
                         listUsernameInfo.ListUserId + "','" + userName + "','" + imgUrl + "','" +
-                        listUsernameInfo.InboxNavigationUrl + "','" + false + "')";
+                        listUsernameInfo.InboxNavigationUrl + "','1','100012494199316')";
+
+                    
                     int yy = sql.ExecuteNonQuery(query);
                 }
             
@@ -122,19 +125,23 @@ namespace Fb_InstaWpf
             return FbPageListmembers;
         }
 
-        public ObservableCollection<SocialUser> GetFbMessengerListData(string userId)
+        public ObservableCollection<SocialUser> GetLeftMessengerListData(string userId)
         {
             SqLiteHelper sql = new SqLiteHelper();
             ObservableCollection<SocialUser> userListInfo = new ObservableCollection<SocialUser>();
-            string query = "select M_InboxUserId,M_inboxUserName,M_InboxUserImage,M_InboxNavigationUrl from TblMessengerList where Parent_User_Id='"+ userId +"'";
+
+
+            string query = "select FacebookId,DisplayName,ImageUrl,NavigationUrl from FacebookUsers where Parent_User_Id='" + userId + "'";
+          
             var dt = sql.GetDataTable(query);
             foreach (DataRow item in dt.Rows)
             {
+                string inboxUserId = Convert.ToString(item["FacebookId"]);
+                string inboxUserName = Convert.ToString(item["DisplayName"]);
+                string inboxUserImage = Convert.ToString(item["ImageUrl"]);
+                string inboxNavigationUrl = Convert.ToString(item["NavigationUrl"]);
 
-                string inboxUserId = Convert.ToString(item["M_InboxUserId"]);
-                string inboxUserName = Convert.ToString(item["M_inboxUserName"]);
-                string inboxUserImage = Convert.ToString(item["M_InboxUserImage"]);
-                string inboxNavigationUrl = Convert.ToString(item["M_InboxNavigationUrl"]);
+
                 //if (!UserListInfo.Any(m => m.InboxUserName.Equals(M_inboxUserName)))
                 if (!userListInfo.Any(m => m.InboxUserName.Equals(inboxUserName)))
                 {
@@ -199,23 +206,33 @@ namespace Fb_InstaWpf
         public ObservableCollection<FbUserMessageInfo> GetMessengerUserComments(string userId)
         {
             ObservableCollection<FbUserMessageInfo> messagingListInfo = new ObservableCollection<FbUserMessageInfo>();
-            string query = "select M_InboxUserId,PlateformType,PostType,Message,ImgSource from TblJob where M_InboxUserId='" + userId + "'";
+            //string query = "select M_InboxUserId,PlateformType,PostType,Message,ImgSource from TblJob where M_InboxUserId='" + userId + "'";
 
+            string query = "select FromUserId,ToUserId,Message,MessageType,MessageDate,ImagePath from Messages where FromUserId='" + userId + "'";
+
+           // string query = "select M_InboxUserId,PlateformType,PostType,Message,ImgSource from TblJob where M_InboxUserId='" + userId + "'";
             var dt = GetSqliteHelper().GetDataTable(query);
             foreach (DataRow item in dt.Rows)
             {
-                string inboxUserId = Convert.ToString(item["M_InboxUserId"]);
-                string PlateformType = Convert.ToString(item["PlateformType"]);
-                string PostType = Convert.ToString(item["PostType"]);
+                //string inboxUserId = Convert.ToString(item["M_InboxUserId"]);
+                //string PlateformType = Convert.ToString(item["PlateformType"]);
+                //string PostType = Convert.ToString(item["PostType"]);
+                //string Message = Convert.ToString(item["Message"]);
+                //string ImgSource = Convert.ToString(item["ImgSource"]);
+                string inboxUserId = Convert.ToString(item["FromUserId"]);
+                string PlateformType = Convert.ToString(item["ToUserId"]);
                 string Message = Convert.ToString(item["Message"]);
-                string ImgSource = Convert.ToString(item["ImgSource"]);
+                string PostType = Convert.ToString(item["MessageType"]);
+                string MessageDate = Convert.ToString(item["MessageDate"]);
+                string ImagePath = Convert.ToString(item["ImagePath"]);
+
                 if (PostType == "0")
                 {
-                    messagingListInfo.Add(new FbUserMessageInfo { UserType = 0, Message = Message, loginguserFbimage = ImgSource });
+                    messagingListInfo.Add(new FbUserMessageInfo { UserType = 0, Message = Message, loginguserFbimage = ImagePath });
                 }
                 else if (PostType == "1")
                 {
-                    messagingListInfo.Add(new FbUserMessageInfo { UserType = 1, Message = Message, otheruserimage = ImgSource });
+                    messagingListInfo.Add(new FbUserMessageInfo { UserType = 1, Message = Message, otheruserimage = ImagePath });
                 }
 
                 messagingListInfo.Add(new FbUserMessageInfo { UserType = 0, Message = Message });
