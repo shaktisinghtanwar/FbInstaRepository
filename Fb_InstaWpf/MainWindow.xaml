@@ -12,6 +12,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="50"></RowDefinition>
             <RowDefinition></RowDefinition>
         </Grid.RowDefinitions>
         <Grid  Height="40"   Background="#FF859EB8" MouseLeftButtonDown="Grid_MouseLeftButtonDown">
@@ -24,7 +25,7 @@
                     <ColumnDefinition Width="129*" ></ColumnDefinition>
                 </Grid.ColumnDefinitions>
                 <Button x:Name="btnUserLogins" Grid.Column="0" FontWeight="Bold" Content="Add UserLogin" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Margin="3,6,0,8" VerticalAlignment="Center" Width="100" Height="32" Click="btnUserLogins_Click" />
-                <ComboBox Name="cmbUser"  Grid.Column="1" Margin="0,2,0,3"  ItemsSource="{Binding LoginUsersList}" SelectedItem="{Binding Path=LoginUser}" DisplayMemberPath="InboxUserName" SelectedValuePath="UserId" BorderThickness="0" VerticalAlignment="Center" Height="32">
+                <ComboBox Name="cmbUser"  Grid.Column="1" Margin="0,2,0,3"  ItemsSource="{Binding LoginUsersList}" SelectedItem="{Binding Path=LoginUser}" DisplayMemberPath="InboxUserName" SelectedValuePath="UserId" BorderThickness="0" VerticalAlignment="Center" Height="32" SelectionChanged="cmbUser_SelectionChanged">
                     <ComboBox.Background>
                         <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
                             <GradientStop Color="#FFF0F0F0" Offset="0"/>
@@ -48,11 +49,31 @@
 
 
         </Grid>
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="1" Background="#FF859EB8">
+            <Grid.ColumnDefinitions >
+                <ColumnDefinition Width="100" ></ColumnDefinition>
+                <ColumnDefinition  Width="250"></ColumnDefinition>
+                <ColumnDefinition  Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+
+            <Label Grid.Column="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Content="PageName:" FontSize="15" Foreground="White" ></Label>
+            <ComboBox Name="cmbUserPageName"  Grid.Column="1" Margin="0,2,0,3"  ItemsSource="{Binding PageList}"  DisplayMemberPath="FbPageName" SelectedValuePath="FbPageId" BorderThickness="0" VerticalAlignment="Center" Height="32" SelectionChanged="cmbUser_SelectionChanged">
+                    <ComboBox.Background>
+                        <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
+                            <GradientStop Color="#FFF0F0F0" Offset="0"/>
+                            <GradientStop Color="#FFE7E7EB" Offset="1"/>
+                        </LinearGradientBrush>
+                    </ComboBox.Background>
+
+                </ComboBox>
+            
+
+        </Grid>
+        <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="125*" MinWidth="250"></ColumnDefinition>
-                <ColumnDefinition Width="128*"></ColumnDefinition>
-                <ColumnDefinition Width="87*"/>
+                <ColumnDefinition Width="145*" MinWidth="250"></ColumnDefinition>
+                <ColumnDefinition Width="249*"></ColumnDefinition>
+                <ColumnDefinition Width="0*"/>
                 <!--<ColumnDefinition Width="54*"></ColumnDefinition>-->
             </Grid.ColumnDefinitions>
             <!--User List-->
@@ -61,7 +82,7 @@
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="Loaded" >
                             <i:InvokeCommandAction Command="{Binding TabCtrlLoaded}" CommandParameter="{Binding ElementName=tabCtrl}" />
-                         
+
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                     <TabItem x:Name="TabLeftItemMessenger"  GotFocus="TabLeftItemMessenger_GotFocus" >
@@ -96,7 +117,7 @@
             </Grid>
 
             <!--messaging-->
-            <Grid  Grid.Column="1" Background="White" Margin="0,38,0,0" Grid.ColumnSpan="2">
+            <Grid  Grid.Column="1" Background="White" Margin="0,38,0,0">
                 <Grid>
                     <TabControl TabStripPlacement="Top"  Width="auto">
 

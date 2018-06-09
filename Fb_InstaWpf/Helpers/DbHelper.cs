@@ -32,6 +32,30 @@ namespace Fb_InstaWpf
             string query = "INSERT INTO Jobs(From_User_id,To_UserId, User_Message,Image_Path,MessageType) values('" + message.FromUserId + "','" + message.ToUserId + "','" + message.Message + "','" + message.ImagePath + "','" + (int)message.MessageType + "')";
             int yy = sql.ExecuteNonQuery(query);
         }
+        public void AddLoginUser(SocialUser loginUser)
+        {
+            var sql = GetSqliteHelper();
+            string query = "INSERT INTO Users(UserName,Password,FacebookId) values('" + loginUser.InboxUserName + "'.'" + loginUser.Password + "','" + loginUser.InboxUserId + "')";
+            int yy = sql.ExecuteNonQuery(query);
+        }
+
+        public void AddFacebookPage(string pageId,string pagename,string pageurl,string loginuserId)
+        {
+
+            var sql1 = GetSqliteHelper();
+            string query1 = "select Count(*) from FbPages where PageId='" + pageId + "'";
+
+            int count = Convert.ToInt32(sql1.ExecuteScalar(query1));
+            if (count==0)
+            {
+                var sql = GetSqliteHelper();
+                string query = "INSERT INTO FbPages(PageId,PageName,PageUrl,Parent_User_Id) values('" + pageId + "'.'" + pagename + "','" + pageurl + "','" + loginuserId + "')";
+                int yy = sql.ExecuteNonQuery(query);
+            }
+
+           
+        }
+     
 
         public ObservableCollection<SocialUser> GetLoginUsers()
         {
@@ -54,6 +78,24 @@ namespace Fb_InstaWpf
             string query = "INSERT INTO TblFbComment(Fbcomment_InboxUserId, Fbcomment_InboxUserName,Fbcomment_InboxUserImage,FBInboxNavigationUrl,Status) values('" + listUsernameInfo.ListUserId + "','" + userName + "','" + imgUrl + "','" + currentURL + "','" + false + "')";
             int yy = sql.ExecuteNonQuery(query);
         }
+
+        public  ObservableCollection<FbPageInfo> GetFacebookPage()
+        {
+            // var usersList = _databaseContext.Users.ToList();
+
+            var sql = GetSqliteHelper();
+            //string query = "select * from TBLLogin";
+            string query = "select * from FbPages";
+            var dt = sql.GetDataTable(query);
+            ObservableCollection<FbPageInfo> pages = new ObservableCollection<FbPageInfo>();
+            foreach (DataRow row in dt.Rows)
+            {
+                pages.Add(new FbPageInfo() { FbPageId = row[1].ToString(), FbPageName = row[2].ToString(), FbPageUrl = row[3].ToString() });
+            }
+            return pages;
+        }
+
+
         public void InsertInstagramMessage(string userName, string currentURL, string imgUrl)
         {
             var sql = GetSqliteHelper();

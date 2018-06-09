@@ -16,6 +16,7 @@ namespace Fb_InstaWpf.ViewModel
     {
         DatabaseContext _databaseContext;
         SocialUser _loginUser;
+        private FbPageInfo _fbPageInfo;
         DbHelper _dbHelper;
         OnlineFetcher _onlineFetcher;
         OnlinePoster _onlinePoster;
@@ -54,11 +55,32 @@ namespace Fb_InstaWpf.ViewModel
                 }
             }
         }
+        public FbPageInfo FbPageInfo
+        {
+            get { return _fbPageInfo; }
+            set
+            {
+                if (value != null)
+                {
+                    _fbPageInfo = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+
 
         public ObservableCollection<SocialUser> LoginUsersList
         {
             get { return _loginUsersList; }
             set { _loginUsersList = value; OnPropertyChanged(); }
+        }
+
+        public ObservableCollection<FbPageInfo> PageList
+        {
+            get { return _pageList; }
+            set { _pageList = value; OnPropertyChanged(); }
         }
 
         public SocialTabViewModel MessengerUserListViewModel
@@ -100,6 +122,7 @@ namespace Fb_InstaWpf.ViewModel
             _dbHelper = new DbHelper();
             _onlineFetcher.LoginSuccessEvent += _onlineFetcher_LoginSuccessEvent;
             Task.Factory.StartNew(() => FillLoginUserList());
+            Task.Factory.StartNew(() => FillPageList());
 
         }
 
@@ -120,6 +143,17 @@ namespace Fb_InstaWpf.ViewModel
                 LoginUser = data.FirstOrDefault();
             });
         }
+
+        private void FillPageList()
+        {
+            var data = _dbHelper.GetFacebookPage();
+            Dispatcher.CurrentDispatcher.Invoke(() =>
+            {
+                PageList = data;
+                FbPageInfo = data.FirstOrDefault();
+            });
+        }
+
 
         public void LeftFbMessengerListCommandHandler(object obj)
         {
@@ -286,12 +320,16 @@ namespace Fb_InstaWpf.ViewModel
 
         private ObservableCollection<SocialUser> _loginUsersList;
 
+
         private string _messageToSend;
 
         private SocialTabViewModel _instaInboxmember;
 
         private SocialTabViewModel _messengerUserListViewModel;
         private int _tabControlSelectedIndex;
+        private ObservableCollection<FbPageInfo> _pageList;
+  
+            
 
         #endregion
 

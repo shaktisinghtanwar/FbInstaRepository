@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Fb_InstaWpf.ViewModel;
 
 namespace Fb_InstaWpf.Model
 {
@@ -22,6 +23,15 @@ namespace Fb_InstaWpf.Model
       public string loginguserInstaimage { get; set; }
       public string otheruserInstaimage { get; set; }
 
+    }
+
+    //create class for contains facebookPage Information
+  public class FbPageInfo : BaseViewModel
+    {
+        public string FbPageId { get; set; }
+        public string FbPageName { get; set; }
+        public string FbPageUrl { get; set; }
+        
     }
 
 
