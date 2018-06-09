@@ -8,16 +8,23 @@ using System.Windows;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using Fb_InstaWpf.DbModel;
+using Fb_InstaWpf.Enums;
 
 namespace Fb_InstaWpf.ViewModel
 {
     public class MainWindowViewModel : BaseViewModel
     {
         DatabaseContext _databaseContext;
-        FacebookUserLoginInfo _loginUser;
+        SocialUser _loginUser;
         DbHelper _dbHelper;
         OnlineFetcher _onlineFetcher;
         OnlinePoster _onlinePoster;
+
+        Task _onlineFetcherFacebookMessagesTask;
+        Task _onlineFetcherFacebookMessengerTask;
+        Task _onlineFetcherInstagramMessagesTask;
+        Task _onlinePosterTask;
+
 
         #region Commands
 
@@ -35,7 +42,7 @@ namespace Fb_InstaWpf.ViewModel
 
         #endregion
 
-        public FacebookUserLoginInfo LoginUser
+        public SocialUser LoginUser
         {
             get { return _loginUser; }
             set
@@ -48,7 +55,7 @@ namespace Fb_InstaWpf.ViewModel
             }
         }
 
-        public ObservableCollection<FacebookUserLoginInfo> LoginUsersList
+        public ObservableCollection<SocialUser> LoginUsersList
         {
             get { return _loginUsersList; }
             set { _loginUsersList = value; OnPropertyChanged(); }
@@ -91,8 +98,17 @@ namespace Fb_InstaWpf.ViewModel
             _onlineFetcher = new OnlineFetcher();
             _onlinePoster = new OnlinePoster();
             _dbHelper = new DbHelper();
-            
+            _onlineFetcher.LoginSuccessEvent += _onlineFetcher_LoginSuccessEvent;
             Task.Factory.StartNew(() => FillLoginUserList());
+
+        }
+
+        private void _onlineFetcher_LoginSuccessEvent()
+        {
+            _onlineFetcherFacebookMessagesTask = Task.Factory.StartNew(() => _onlineFetcher.GetFacebookMessages());
+            _onlineFetcherInstagramMessagesTask = Task.Factory.StartNew(() => _onlineFetcher.GetInstaMesages());
+            _onlineFetcherFacebookMessengerTask = Task.Factory.StartNew(() => _onlineFetcher.GetFbMessengerMessages());
+            _onlinePosterTask = Task.Factory.StartNew(() => _onlinePoster.ProcessMessage());
         }
 
         private void FillLoginUserList()
@@ -126,11 +142,12 @@ namespace Fb_InstaWpf.ViewModel
 
         private void LeftMessengerData()
         {
-            var data = _dbHelper.GetLeftMessengerListData(LoginUser.UserId);
+            if (MessengerUserListViewModel != null) return;
+            var data = _dbHelper.GetLeftMessengerListData(LoginUser.InboxUserId, TabType.Messenger);
 
             Application.Current.Dispatcher.Invoke(() =>
             {
-                MessengerUserListViewModel = MessengerUserListViewModel ?? new SocialTabViewModel(Enums.TabType.Messenger)
+                MessengerUserListViewModel = MessengerUserListViewModel ?? new SocialTabViewModel(Enums.TabType.Messenger,LoginUser)
                 {
                     UserListInfo = data
                 };
@@ -141,11 +158,13 @@ namespace Fb_InstaWpf.ViewModel
 
         private void LeftFacebookData()
         {
-            var data = _dbHelper.GetLeftMessengerListData(LoginUser.UserId);
+            if (FacebookUserListViewModel != null) return;
+
+            var data = _dbHelper.GetLeftMessengerListData(LoginUser.InboxUserId, TabType.Facebook);
            // var data = _dbHelper.GetFacebookListData(LoginUser.UserId);
             Application.Current.Dispatcher.Invoke(() =>
             {
-                FacebookUserListViewModel = FacebookUserListViewModel ?? new SocialTabViewModel(Enums.TabType.Facebook)
+                FacebookUserListViewModel = FacebookUserListViewModel ?? new SocialTabViewModel(Enums.TabType.Facebook,LoginUser)
                 {
                     UserListInfo = data
                 };
@@ -156,11 +175,13 @@ namespace Fb_InstaWpf.ViewModel
 
         private void LeftInstagramData()
         {
+            if (InstagramUserListViewModel != null) return;
+
             //var data = _dbHelper.GetInstaUserList(LoginUser.UserId);
-             var data = _dbHelper.GetLeftMessengerListData(LoginUser.UserId);
+            var data = _dbHelper.GetLeftMessengerListData(LoginUser.InboxUserId, TabType.Instagram);
             Application.Current.Dispatcher.Invoke(() =>
             {
-                InstagramUserListViewModel = InstagramUserListViewModel ?? new SocialTabViewModel(Enums.TabType.Instagram)
+                InstagramUserListViewModel = InstagramUserListViewModel ?? new SocialTabViewModel(Enums.TabType.Instagram,LoginUser)
                 {
                     UserListInfo = data
                 };
@@ -260,10 +281,10 @@ namespace Fb_InstaWpf.ViewModel
 
         private void LoginCommandHandler(object obj)
         {
-            _onlineFetcher.LoginWithSelenium();
-        }
+            _onlineFetcher.LoginWithSelenium(LoginUser.InboxUserName,LoginUser.Password);
+       }
 
-        private ObservableCollection<FacebookUserLoginInfo> _loginUsersList;
+        private ObservableCollection<SocialUser> _loginUsersList;
 
         private string _messageToSend;
 

@@ -24,7 +24,7 @@
                     <ColumnDefinition Width="129*" ></ColumnDefinition>
                 </Grid.ColumnDefinitions>
                 <Button x:Name="btnUserLogins" Grid.Column="0" FontWeight="Bold" Content="Add UserLogin" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Margin="3,6,0,8" VerticalAlignment="Center" Width="100" Height="32" Click="btnUserLogins_Click" />
-                <ComboBox Name="cmbUser"  Grid.Column="1" Margin="0,2,0,3"  ItemsSource="{Binding LoginUsersList}" SelectedItem="{Binding Path=LoginUser}" DisplayMemberPath="LoginUserName" SelectedValuePath="UserId" BorderThickness="0" VerticalAlignment="Center" Height="32">
+                <ComboBox Name="cmbUser"  Grid.Column="1" Margin="0,2,0,3"  ItemsSource="{Binding LoginUsersList}" SelectedItem="{Binding Path=LoginUser}" DisplayMemberPath="InboxUserName" SelectedValuePath="UserId" BorderThickness="0" VerticalAlignment="Center" Height="32">
                     <ComboBox.Background>
                         <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
                             <GradientStop Color="#FFF0F0F0" Offset="0"/>

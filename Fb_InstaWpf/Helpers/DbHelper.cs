@@ -33,7 +33,7 @@ namespace Fb_InstaWpf
             int yy = sql.ExecuteNonQuery(query);
         }
 
-        public ObservableCollection<FacebookUserLoginInfo> GetLoginUsers()
+        public ObservableCollection<SocialUser> GetLoginUsers()
         {
            // var usersList = _databaseContext.Users.ToList();
 
@@ -41,10 +41,10 @@ namespace Fb_InstaWpf
             //string query = "select * from TBLLogin";
             string query = "select * from Users";
             var dt = sql.GetDataTable(query);
-            ObservableCollection<FacebookUserLoginInfo> users = new ObservableCollection<FacebookUserLoginInfo>();
+            ObservableCollection<SocialUser> users = new ObservableCollection<SocialUser>();
             foreach (DataRow row in dt.Rows)
             {
-                users.Add(new FacebookUserLoginInfo() { LoginUserName = row[1].ToString(), UserId = row[3].ToString(), Password = row[2].ToString() });
+                users.Add(new SocialUser() { UserId = row[0].ToString(), InboxUserId = row[3].ToString(), InboxUserName = row[1].ToString(), Password = row[2].ToString() });
             }
             return users;
         }
@@ -125,13 +125,13 @@ namespace Fb_InstaWpf
             return FbPageListmembers;
         }
 
-        public ObservableCollection<SocialUser> GetLeftMessengerListData(string userId)
+        public ObservableCollection<SocialUser> GetLeftMessengerListData(string userId,TabType tabType)
         {
             SqLiteHelper sql = new SqLiteHelper();
             ObservableCollection<SocialUser> userListInfo = new ObservableCollection<SocialUser>();
 
 
-            string query = "select FacebookId,DisplayName,ImageUrl,NavigationUrl from FacebookUsers where Parent_User_Id='" + userId + "'";
+            string query = string.Format( "select FacebookId,DisplayName,ImageUrl,NavigationUrl from FacebookUsers where Parent_User_Id='{0}' and JobType={1}", userId ,(int)tabType) ;
           
             var dt = sql.GetDataTable(query);
             foreach (DataRow item in dt.Rows)

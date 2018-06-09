@@ -76,7 +76,7 @@
                 <Button HorizontalAlignment="Left" Margin="5"  Width="30" Height="35" Background="{x:Null}" BorderThickness="0" Command="{ Binding SendimageCommand}">
                     <Image Source="Images/attached.png" Width="26" />
                 </Button>
-                <Button x:Name="btnSendText" Content="Send"  Margin="5"  Height="35" Background="{x:Null}" FontWeight="Bold" FontSize="16" Foreground="#FF3399FF" BorderThickness="0" Command="{Binding SendMessageCommand}" />
+                <Button x:Name="btnSendText" Content="Send"  Margin="5"  Height="35" Background="{x:Null}" FontWeight="Bold" FontSize="16" Foreground="#FF3399FF" BorderThickness="0" Command="{Binding SendMessageCommand, UpdateSourceTrigger=LostFocus}" />
             </StackPanel>
         </Grid>
 

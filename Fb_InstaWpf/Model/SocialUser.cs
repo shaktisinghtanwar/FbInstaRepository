@@ -12,14 +12,25 @@ namespace Fb_InstaWpf.Model
         private string _inboxUserName;
         private string _inboxNavigationUrl;
         private string _messageUserType;
+        private string _password;
         DbHelper _dbHelper;
         private ObservableCollection<FbUserMessageInfo> _messages;
-      
+        private string _userId;
 
+        public string Password
+        {
+            get { return _password; }
+            set
+            {
+                _password = value;
+                OnPropertyChanged();
+            }
+
+        }
         public SocialUser()
         {
             _dbHelper = new DbHelper();
-            
+
         }
 
         private void LoadMessages()
@@ -29,7 +40,7 @@ namespace Fb_InstaWpf.Model
 
         public string InboxUserId
         {
-            get {return _inboxUserId;}
+            get { return _inboxUserId; }
             set
             {
                 _inboxUserId = value;
@@ -40,7 +51,7 @@ namespace Fb_InstaWpf.Model
 
         public string InboxUserImage
         {
-            get{return _inboxUserImage;}
+            get { return _inboxUserImage; }
             set
             {
                 _inboxUserImage = value;
@@ -50,7 +61,7 @@ namespace Fb_InstaWpf.Model
 
         public string InboxUserName
         {
-            get {return _inboxUserName;} 
+            get { return _inboxUserName; }
             set
             {
                 _inboxUserName = value;
@@ -59,7 +70,7 @@ namespace Fb_InstaWpf.Model
         }
         public string InboxNavigationUrl
         {
-            get {return _inboxNavigationUrl;}
+            get { return _inboxNavigationUrl; }
             set
             {
                 _inboxNavigationUrl = value;
@@ -67,8 +78,9 @@ namespace Fb_InstaWpf.Model
             }
         }
 
-        public ObservableCollection<FbUserMessageInfo> Messages {
-            get {return _messages;}
+        public ObservableCollection<FbUserMessageInfo> Messages
+        {
+            get { return _messages; }
             set
             {
                 _messages = value;
@@ -86,8 +98,15 @@ namespace Fb_InstaWpf.Model
             }
         }
 
-
+        public string UserId
+        {
+            get { return _userId; }
+            set
+            {
+                _userId = value;
+                OnPropertyChanged();
+            }
+        }
     }
-
 
 }

@@ -19,7 +19,7 @@ namespace Fb_InstaWpf.ViewModel
         private SocialUser _selectedUserInfo;
 
         private SocialUser _activeTabUserInfo;
-        OnlineFetcher _OnlineFetcher;
+        OnlineFetcher _onlineFetcher;
 
         private ObservableCollection<SocialUser> _selectedUsers;
 
@@ -108,14 +108,16 @@ namespace Fb_InstaWpf.ViewModel
             }
         }
 
-        public SocialTabViewModel(TabType tabType)
+        public SocialTabViewModel(TabType tabType, SocialUser loginUser)
         {
+            LoginUser = loginUser;
             TabType = tabType.ToString();
             SendMessageCommand = new DelegateCommand(SendMessageCommandHandler, null);
             SelectedUsers = new ObservableCollection<SocialUser>();
             SendMessageInstaCommand = new DelegateCommand(SendMessageInstaCommandhandlar, null);
             SendimageFBCommand = new DelegateCommand(SendimageFBCommandHandler, null);
             SendFbCommentCommand = new DelegateCommand(SendFbCommentCommandHandler, null);
+            _onlineFetcher = new OnlineFetcher();
             _dbHelper = new DbHelper();
         }
 
@@ -148,7 +150,7 @@ namespace Fb_InstaWpf.ViewModel
 
             PostMessage message = new PostMessage()
             {
-                FromUserId = LoginUser.InboxUserId,
+                FromUserId = LoginUser.UserId,
                 ToUserId = ActiveTabUser.InboxUserId,
                 MessageType = MessageType.FacebookMessengerImage,
                 ImagePath = fileName,
@@ -204,7 +206,7 @@ namespace Fb_InstaWpf.ViewModel
             if (!SelectedUsers.Any(m => m.InboxUserName.Equals(fbpageInboxUserInfo.InboxUserName)))
             {
                 SelectedUsers.Add(fbpageInboxUserInfo);
-                if (_OnlineFetcher.isLoggedIn)
+                if (_onlineFetcher.isLoggedIn)
                 {
                     ////For Messanger Message Method
                 }

@@ -9,9 +9,9 @@ namespace Fb_InstaWpf.Enums
 {
     public enum TabType
     {
-        Messenger,
-        Facebook,
-        Instagram
+        Messenger =0,
+        Facebook =1,
+        Instagram =2
     }
 
     public delegate void SelectedUserChangedDelegate<T>(T socialUser);
