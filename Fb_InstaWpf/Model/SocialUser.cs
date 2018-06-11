@@ -10,6 +10,7 @@ namespace Fb_InstaWpf.Model
         private string _inboxUserId;
         private string _inboxUserImage;
         private string _inboxUserName;
+        private string _pageId;
         private string _inboxNavigationUrl;
         private string _messageUserType;
         private string _password;
@@ -58,7 +59,16 @@ namespace Fb_InstaWpf.Model
                 OnPropertyChanged();
             }
         }
-
+        public string PageId
+        {
+            get { return _pageId; }
+            set
+            {
+                _pageId = value;
+                OnPropertyChanged();
+            }
+        }
+        
         public string InboxUserName
         {
             get { return _inboxUserName; }

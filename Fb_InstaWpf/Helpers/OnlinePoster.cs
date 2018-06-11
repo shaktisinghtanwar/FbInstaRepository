@@ -17,7 +17,7 @@ namespace Fb_InstaWpf
 
             RestartThread();
         }
-      
+      //
         public void ProcessMessage()
         {
             PostMessage message;

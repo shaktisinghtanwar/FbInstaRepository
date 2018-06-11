@@ -5,6 +5,7 @@ using System.Text;
 using Fb_InstaWpf.Helper;
 using Fb_InstaWpf.Model;
 using System.IO;
+using System.Windows;
 
 namespace Fb_InstaWpf.ViewModel
 {
@@ -114,9 +115,9 @@ namespace Fb_InstaWpf.ViewModel
         SqLiteHelper sql = new SqLiteHelper();
         private void NewUserCommandHandler(object obj)
         {
-            //SMessageBox.Show("UserId= " + TxtUserId + Environment.NewLine + "Password= " + TxtPassword);
+            MessageBox.Show("UserId= " + TxtUserId + Environment.NewLine + "Password= " + TxtPassword);
             string Credential = TxtUserId + ":" + TxtPassword;
-            //SqLiteHelper sql1 = new SqLiteHelper();
+            SqLiteHelper sql1 = new SqLiteHelper();
             string query = "INSERT INTO TblLogin(FbUserName,FbPassword) values('" + TxtUserId + "','" + TxtPassword + "')";
           
             int yy = sql.ExecuteNonQuery(query);

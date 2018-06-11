@@ -28,9 +28,14 @@ namespace Fb_InstaWpf
         }
         public void Add(PostMessage message)
         {
+            //ObservableCollection<FbUserMessageInfo> messagingListInfo = new ObservableCollection<FbUserMessageInfo>();
             var sql = GetSqliteHelper();
-            string query = "INSERT INTO Jobs(From_User_id,To_UserId, User_Message,Image_Path,MessageType) values('" + message.FromUserId + "','" + message.ToUserId + "','" + message.Message + "','" + message.ImagePath + "','" + (int)message.MessageType + "')";
+            string query = "INSERT INTO Jobs(FromUserId,ToUserId, Message,ImagePath,MessageType,PlateformType) values('" + message.FromUserId + "','" + message.ToUserId + "','" + message.Message + "','" + message.ImagePath + "','" + (int)message.MessageType + "','" + "1" + "')";
             int yy = sql.ExecuteNonQuery(query);
+
+            
+
+
         }
         public void AddLoginUser(SocialUser loginUser)
         {
@@ -42,16 +47,16 @@ namespace Fb_InstaWpf
         public void AddFacebookPage(string pageId,string pagename,string pageurl,string loginuserId)
         {
 
-            //var sql1 = GetSqliteHelper();
-            //string query1 = "select Count(*) from FbPages where PageId='" + pageId + "'";
+            var sql1 = GetSqliteHelper();
+            string query1 = "select Count(*) from FbPages where PageId='" + pageId + "'";
 
-            //int count = Convert.ToInt32(sql1.ExecuteScalar(query1));
-            //if (count==0)
-            //{
-            var sql = GetSqliteHelper();
-            string query = "INSERT INTO FbPages(PageId,PageName,PageUrl,Parent_User_Id) values('" + pageId + "'.'" + pagename + "','" + pageurl + "','" + loginuserId + "')";
-            int yy = sql.ExecuteNonQuery(query);
-            //}
+            int count = Convert.ToInt32(sql1.ExecuteScalar(query1));
+            if (count == 0)
+            {
+                var sql = GetSqliteHelper();
+                string query = "INSERT INTO FbPages(PageId,PageName,PageUrl,Parent_User_Id) values('" + pageId + "','" + pagename + "','" + pageurl + "','" + loginuserId + "')";
+                int yy = sql.ExecuteNonQuery(query);
+            }
 
 
         }
@@ -167,13 +172,14 @@ namespace Fb_InstaWpf
             return FbPageListmembers;
         }
 
-        public ObservableCollection<SocialUser> GetLeftMessengerListData(string userId,TabType tabType)
+        public ObservableCollection<SocialUser> GetLeftMessengerListData(string userId,TabType tabType,string pageid)
         {
             SqLiteHelper sql = new SqLiteHelper();
             ObservableCollection<SocialUser> userListInfo = new ObservableCollection<SocialUser>();
 
 
-            string query = string.Format( "select FacebookId,DisplayName,ImageUrl,NavigationUrl from FacebookUsers where Parent_User_Id='{0}' and JobType={1}", userId ,(int)tabType) ;
+            //string query = string.Format("select FacebookId,DisplayName,ImageUrl,NavigationUrl from FacebookUsers where Parent_User_Id='{0}' and JobType={1} ", userId, (int)tabType);
+            string query = "select FacebookId,DisplayName,ImageUrl,NavigationUrl,PageId from FacebookUsers where Parent_User_Id='" + userId + "' and JobType='" + (int)tabType + "' and PageId='" + pageid + "'";
           
             var dt = sql.GetDataTable(query);
             foreach (DataRow item in dt.Rows)
@@ -182,13 +188,17 @@ namespace Fb_InstaWpf
                 string inboxUserName = Convert.ToString(item["DisplayName"]);
                 string inboxUserImage = Convert.ToString(item["ImageUrl"]);
                 string inboxNavigationUrl = Convert.ToString(item["NavigationUrl"]);
-
+                string pageId = Convert.ToString(item["PageId"]);
 
                 //if (!UserListInfo.Any(m => m.InboxUserName.Equals(M_inboxUserName)))
-                if (!userListInfo.Any(m => m.InboxUserName.Equals(inboxUserName)))
+                if (!userListInfo.Any(m => m.InboxUserId.Equals(inboxUserId)))
                 {
                     userListInfo.Add(new SocialUser() { InboxUserId = inboxUserId, InboxUserName = inboxUserName,
-                        InboxUserImage = inboxUserImage, InboxNavigationUrl = inboxNavigationUrl, MessageUserType = TabType.Messenger.ToString() });
+                                                        InboxUserImage = inboxUserImage,
+                                                        InboxNavigationUrl = inboxNavigationUrl,
+                                                        MessageUserType = tabType.ToString(),
+                                                        PageId = pageId
+                    });
 
                 }
             }
@@ -250,7 +260,7 @@ namespace Fb_InstaWpf
             ObservableCollection<FbUserMessageInfo> messagingListInfo = new ObservableCollection<FbUserMessageInfo>();
             //string query = "select M_InboxUserId,PlateformType,PostType,Message,ImgSource from TblJob where M_InboxUserId='" + userId + "'";
 
-            string query = "select FromUserId,ToUserId,Message,MessageType,MessageDate,ImagePath from Messages where FromUserId='" + userId + "'";
+            string query = "select FromUserId,ToUserId,Message,MessageType,MessageDate,ImagePath from Messages where ToUserId='" + userId + "'";
 
            // string query = "select M_InboxUserId,PlateformType,PostType,Message,ImgSource from TblJob where M_InboxUserId='" + userId + "'";
             var dt = GetSqliteHelper().GetDataTable(query);
@@ -262,7 +272,7 @@ namespace Fb_InstaWpf
                 //string Message = Convert.ToString(item["Message"]);
                 //string ImgSource = Convert.ToString(item["ImgSource"]);
                 string inboxUserId = Convert.ToString(item["FromUserId"]);
-                string PlateformType = Convert.ToString(item["ToUserId"]);
+                string ToUserId = Convert.ToString(item["ToUserId"]);
                 string Message = Convert.ToString(item["Message"]);
                 string PostType = Convert.ToString(item["MessageType"]);
                 string MessageDate = Convert.ToString(item["MessageDate"]);
@@ -277,7 +287,10 @@ namespace Fb_InstaWpf
                     messagingListInfo.Add(new FbUserMessageInfo { UserType = 1, Message = Message, otheruserimage = ImagePath });
                 }
 
-                messagingListInfo.Add(new FbUserMessageInfo { UserType = 0, Message = Message });
+                else
+                {
+                    messagingListInfo.Add(new FbUserMessageInfo { UserType = 0, Message = Message });
+                }
             }
             return messagingListInfo;
         }

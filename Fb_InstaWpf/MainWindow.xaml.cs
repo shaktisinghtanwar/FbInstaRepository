@@ -64,10 +64,7 @@ namespace Fb_InstaWpf
             addLoginUsers.ShowDialog();
         }
 
-        private void cmbUser_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
-        {
-
-        }
+       
 
     }
 }

@@ -28,7 +28,7 @@ namespace Fb_InstaWpf.ViewModel
         string _tabType;
         string _messageToSend;
 
-        DbHelper _dbHelper;
+        DbHelper _dbHelper=new DbHelper();
         
         public SocialUser SelectedItem
         {
@@ -176,7 +176,11 @@ namespace Fb_InstaWpf.ViewModel
 
 
 
-            _dbHelper.Add(new PostMessage() { FromUserId = LoginUser.InboxUserId, ToUserId = SelectedItem.InboxUserId, Message = message.ToString(), MessageType = MessageType.FacebookMessage });
+            _dbHelper.Add(new PostMessage() { FromUserId = LoginUser.InboxUserId, ToUserId = SelectedItem.InboxUserId, Message = MessageToSend, MessageType = MessageType.FacebookMessage, ImagePath = null });
+            MessageBox.Show("Message save successfully");
+           _selectedUserInfo.Messages.Add(new FbUserMessageInfo { UserType = 0, Message =MessageToSend});
+           MessageToSend = "";
+
         }
         private void SendimageFBCommandHandler(object obj)
         {

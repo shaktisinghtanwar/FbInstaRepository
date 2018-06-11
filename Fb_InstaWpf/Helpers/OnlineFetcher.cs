@@ -35,7 +35,7 @@ namespace Fb_InstaWpf
         public List<String> LstPageUrl = new List<string>();
         private readonly Queue<string> _queueFbCmntImgUrl = new Queue<string>();
         
-        DbHelper _dbHelper;
+        DbHelper _dbHelper =new DbHelper();
         private ICookieJar _cookieJar;
         public bool isLoggedIn = false;
         public void LoginWithSelenium(string userName ,string password)
@@ -195,7 +195,7 @@ namespace Fb_InstaWpf
                         fbPageInfo.FbPageUrl = _queueFbCmntImgUrl.Dequeue();
                         listFbPageInfo.Add(fbPageInfo);
                    //     _dbHelper.GetLoginUsers();
-                   //     _dbHelper.AddFacebookPage(fbPageInfo.FbPageId,fbPageInfo.FbPageName,fbPageInfo.FbPageUrl,userName);
+                        _dbHelper.AddFacebookPage(fbPageInfo.FbPageId,fbPageInfo.FbPageName,fbPageInfo.FbPageUrl,userName);
 
                         
                     }

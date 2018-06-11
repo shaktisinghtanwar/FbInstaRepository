@@ -93,16 +93,25 @@ namespace Fb_InstaWpf.Helper
         public int ExecuteNonQuery(string sql)
         {
             int rowsUpdated;
-            SQLiteConnection cnn = new SQLiteConnection(DbConnection);
-            cnn.Open();
-            using (var transaction = cnn.BeginTransaction())
+            try
             {
-                SQLiteCommand mycommand = new SQLiteCommand(cnn);
-                mycommand.CommandText = sql;
-                rowsUpdated = mycommand.ExecuteNonQuery();
-                transaction.Commit();
-                cnn.Close();
+                SQLiteConnection cnn = new SQLiteConnection(DbConnection);
+                cnn.Open();
+                using (var transaction = cnn.BeginTransaction())
+                {
+                    SQLiteCommand mycommand = new SQLiteCommand(cnn);
+                    mycommand.CommandText = sql;
+                    rowsUpdated = mycommand.ExecuteNonQuery();
+                    transaction.Commit();
+                    cnn.Close();
+                }
             }
+            catch (Exception ex)
+            {
+                
+                throw;
+            }
+           
             return rowsUpdated;
         }
 
