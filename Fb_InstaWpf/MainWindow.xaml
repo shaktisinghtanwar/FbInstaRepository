@@ -53,10 +53,10 @@
             <Grid.ColumnDefinitions >
                 <ColumnDefinition Width="100" ></ColumnDefinition>
                 <ColumnDefinition  Width="250"></ColumnDefinition>
-                <ColumnDefinition  Width="*"></ColumnDefinition>
+                <ColumnDefinition  Width="150"></ColumnDefinition>
             </Grid.ColumnDefinitions>
 
-            <Label Grid.Column="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Content="PageName:" FontSize="15" Foreground="White" ></Label>
+            <Label Grid.Column="0" HorizontalContentAlignment="Center" FontWeight="Bold" VerticalContentAlignment="Center" Content="PageName:" Foreground="White" />
             <ComboBox Name="cmbUserPageName"  Grid.Column="1" Margin="0,2,0,3"  ItemsSource="{Binding PageList}"  DisplayMemberPath="FbPageName" SelectedValuePath="FbPageId" BorderThickness="0" VerticalAlignment="Center" Height="32" SelectionChanged="cmbUser_SelectionChanged">
                     <ComboBox.Background>
                         <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
@@ -66,7 +66,7 @@
                     </ComboBox.Background>
 
                 </ComboBox>
-            
+            <Button x:Name="btnFatchAllPages"  Grid.Column="2" FontWeight="Bold" Content="Get All Pages" HorizontalAlignment="Left"  Margin="23,4,0,4" Width="100" Height="30"  Command="{Binding FetchAllLoggedinUserPages}"  />
 
         </Grid>
         <Grid Grid.Row="2">

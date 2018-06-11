@@ -35,25 +35,25 @@ namespace Fb_InstaWpf
         public void AddLoginUser(SocialUser loginUser)
         {
             var sql = GetSqliteHelper();
-            string query = "INSERT INTO Users(UserName,Password,FacebookId) values('" + loginUser.InboxUserName + "'.'" + loginUser.Password + "','" + loginUser.InboxUserId + "')";
+            string query = "INSERT INTO Users(UserName,Password,FacebookId) values('" + loginUser.InboxUserName + "','" + loginUser.Password + "','" + loginUser.InboxUserId + "')";
             int yy = sql.ExecuteNonQuery(query);
         }
 
         public void AddFacebookPage(string pageId,string pagename,string pageurl,string loginuserId)
         {
 
-            var sql1 = GetSqliteHelper();
-            string query1 = "select Count(*) from FbPages where PageId='" + pageId + "'";
+            //var sql1 = GetSqliteHelper();
+            //string query1 = "select Count(*) from FbPages where PageId='" + pageId + "'";
 
-            int count = Convert.ToInt32(sql1.ExecuteScalar(query1));
-            if (count==0)
-            {
-                var sql = GetSqliteHelper();
-                string query = "INSERT INTO FbPages(PageId,PageName,PageUrl,Parent_User_Id) values('" + pageId + "'.'" + pagename + "','" + pageurl + "','" + loginuserId + "')";
-                int yy = sql.ExecuteNonQuery(query);
-            }
+            //int count = Convert.ToInt32(sql1.ExecuteScalar(query1));
+            //if (count==0)
+            //{
+            var sql = GetSqliteHelper();
+            string query = "INSERT INTO FbPages(PageId,PageName,PageUrl,Parent_User_Id) values('" + pageId + "'.'" + pagename + "','" + pageurl + "','" + loginuserId + "')";
+            int yy = sql.ExecuteNonQuery(query);
+            //}
 
-           
+
         }
      
 

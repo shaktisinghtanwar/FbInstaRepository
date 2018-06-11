@@ -21,7 +21,7 @@ namespace Fb_InstaWpf.ViewModel
         OnlineFetcher _onlineFetcher;
         OnlinePoster _onlinePoster;
 
-        Task _onlineFetcherFacebookMessagesTask;
+        Task _onlineFetcherGetAllPagesTask;
         Task _onlineFetcherFacebookMessengerTask;
         Task _onlineFetcherInstagramMessagesTask;
         Task _onlinePosterTask;
@@ -30,6 +30,7 @@ namespace Fb_InstaWpf.ViewModel
         #region Commands
 
         public DelegateCommand LoginCommand { get; set; }
+        public DelegateCommand FetchAllLoggedinUserPages { get; set; }
         public DelegateCommand FbMessengerListCommand { get; set; }
         public DelegateCommand FbPageInboxCommand { get; set; }
         public DelegateCommand InstaInboxCommand { get; set; }
@@ -109,6 +110,7 @@ namespace Fb_InstaWpf.ViewModel
         {
             LoginImageInfo = new ObservableCollection<ImageLoginTextbox>();
             LoginCommand = new DelegateCommand(LoginCommandHandler, null);
+            FetchAllLoggedinUserPages = new DelegateCommand(FetchAllLoggedinUserPagesCommandHandler, null);
             FbMessengerListCommand = new DelegateCommand(LeftFbMessengerListCommandHandler, null);
             InstaInboxCommand = new DelegateCommand(LeftInstaInboxCommandHandler, null);
             FbPageInboxCommand = new DelegateCommand(LeftFbPageInboxCommandHandler, null);
@@ -126,9 +128,15 @@ namespace Fb_InstaWpf.ViewModel
 
         }
 
+        private void FetchAllLoggedinUserPagesCommandHandler(object obj)
+        {
+            //GetAllPaLoggedinUserPages
+            _onlineFetcherGetAllPagesTask = Task.Factory.StartNew(() => _onlineFetcher.GetAllPaLoggedinUserPages(LoginUser.InboxUserName));
+        }
+
         private void _onlineFetcher_LoginSuccessEvent()
         {
-            _onlineFetcherFacebookMessagesTask = Task.Factory.StartNew(() => _onlineFetcher.GetFacebookMessages());
+            _onlineFetcherGetAllPagesTask = Task.Factory.StartNew(() => _onlineFetcher.GetFacebookMessages());
             _onlineFetcherInstagramMessagesTask = Task.Factory.StartNew(() => _onlineFetcher.GetInstaMesages());
             _onlineFetcherFacebookMessengerTask = Task.Factory.StartNew(() => _onlineFetcher.GetFbMessengerMessages());
             _onlinePosterTask = Task.Factory.StartNew(() => _onlinePoster.ProcessMessage());

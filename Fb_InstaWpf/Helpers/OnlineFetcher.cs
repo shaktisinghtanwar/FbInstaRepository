@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Threading;
 using HtmlAgilityPack;
 using System.Text.RegularExpressions;
+using System.Collections;
 
 namespace Fb_InstaWpf
 {
@@ -29,7 +30,7 @@ namespace Fb_InstaWpf
             }
             return driver;
         }
-       ChromeDriver ChromeWebDriver { get; set; }
+       ChromeDriver chromeWebDriver { get; set; }
         ChromeOptions _options = new ChromeOptions();
         public List<String> LstPageUrl = new List<string>();
         private readonly Queue<string> _queueFbCmntImgUrl = new Queue<string>();
@@ -50,7 +51,7 @@ namespace Fb_InstaWpf
                 _options.AddArgument("--log-level=3");
                 ChromeDriverService chromeDriverService = ChromeDriverService.CreateDefaultService(appStartupPath);
                 chromeDriverService.HideCommandPromptWindow = true;
-                var chromeWebDriver = new ChromeDriver(chromeDriverService, _options);
+                chromeWebDriver = new ChromeDriver(chromeDriverService, _options);
                 chromeWebDriver.Manage().Window.Maximize();
                 chromeWebDriver.Navigate().GoToUrl(url);
                 try
@@ -110,45 +111,19 @@ namespace Fb_InstaWpf
                     {
 
                     }
-                    ReadOnlyCollection<IWebElement> pageNodeImgUrl = chromeWebDriver.FindElements((By.XPath("//*[@class='clearfix _1vh8']/a")));
-                    if (pageNodeImgUrl.Count > 0)
-                    {
-                       
-
-                        foreach (var pageNodeItem in pageNodeImgUrl)
-                        {
-                          var  TemppageNodeItem = pageNodeItem.GetAttribute("href");
-                            fbPageInfo.FbPageUrl = TemppageNodeItem;
-                            LstPageUrl.Add(TemppageNodeItem);
-                           
-                            _queueFbCmntImgUrl.Enqueue(TemppageNodeItem);
-                        }
-
-                        //for (int i = 0; i < LstPageUrl.Count; i++)
-                        //{ }
-                        chromeWebDriver.Navigate().GoToUrl(new Uri(LstPageUrl[2]));
-                        Thread.Sleep(2000);
-
-                        ReadOnlyCollection<IWebElement> collection1 = chromeWebDriver.FindElements(By.XPath("//*[@id='u_0_u']/div/div/div[1]/ul/li[2]/a"));
-                        if (collection1.Count > 0)
-                        {
-                            collection1[0].Click();
-                        }
-
-
-                    }
+                   // GetAllPaLoggedinUserPages();
 
                     Thread.Sleep(5000);
                     // ShowMessengerListData();
-                    GetFbMessengerMessages();
-                    Thread.Sleep(2000);
+                    ////GetFbMessengerMessages();
+                    ////Thread.Sleep(2000);
                     LoginSuccessEvent();
                     _cookieJar = chromeWebDriver.Manage().Cookies;
 
                     isLoggedIn = true;
                     Thread.Sleep(2000);
 
-                   // Image.Visibility = Visibility.Hidden;
+                    // Image.Visibility = Visibility.Hidden;
                 }
 
             }
@@ -159,195 +134,86 @@ namespace Fb_InstaWpf
             }
         }
 
-        public void GetFacebookMessages1()
+        public void GetAllPaLoggedinUserPages(string userName)
         {
-            var chromeWebDriver = GetDriver();
-            ListUsernameInfo listUsernameInfo = new ListUsernameInfo();
-            string url = "https://www.facebook.com/pages/?category=your_pages";
-            chromeWebDriver.Navigate().GoToUrl(url);
-            Thread.Sleep(2000);
-            var pageUrlList = new List<string>();
-            var queueFbCmntImgUrl = new Queue<string>();
-            ReadOnlyCollection<IWebElement> pageNodeImgUrl = chromeWebDriver.FindElements((By.XPath("//*[@class='clearfix _1vh8']/a")));
-            if (pageNodeImgUrl.Count > 0)
-            {
-                foreach (var pageNodeItem in pageNodeImgUrl)
-                {
-                    var temppageNodeItem = pageNodeItem.GetAttribute("href");
-                    pageUrlList.Add(temppageNodeItem);
-                    queueFbCmntImgUrl.Enqueue(temppageNodeItem);
-                }
+            var listFbPageInfo = new List<FbPageInfo>();
+           //var chromeWebDriver = GetDriver();
+            chromeWebDriver.Navigate().GoToUrl("https://www.facebook.com/pages/?category=your_pages");
+            
 
-                //WebDriverWait wait = new WebDriverWait(chromeWebDriver, TimeSpan.FromSeconds(30));
-                //wait.Until(ExpectedConditions.VisibilityOfAllElementsLocatedBy(By.Id("h")));
-
-                Thread.Sleep(2000);
-                chromeWebDriver.Navigate().GoToUrl(new Uri(pageUrlList[2]));
-                Thread.Sleep(2000);
-
-                ReadOnlyCollection<IWebElement> collection1 = chromeWebDriver.FindElements(By.XPath("//*[@id='u_0_u']/div/div/div[1]/ul/li[2]/a"));
-                if (collection1.Count > 0)
-                {
-                    collection1[0].Click();
-                }
-                Thread.Sleep(2000);
-                ReadOnlyCollection<IWebElement> collectionTab2 = chromeWebDriver.FindElements(By.ClassName("_32wr"));
-                if (collectionTab2.Count > 0)
-                {
-                    collectionTab2[1].Click();
-                }
-                Thread.Sleep(2000);
-                var pageSource = chromeWebDriver.PageSource;
-                HtmlDocument htmlDocument = new HtmlDocument();
-                htmlDocument.LoadHtml(pageSource);
-                Thread.Sleep(2000);
-                HtmlNodeCollection imgNode = htmlDocument.DocumentNode.SelectNodes("//*[@id='u_0_t']/div/div/div/table/tbody/tr/td[1]/div/div[2]/div/div[1]/div/div/div/div/div/div/img");
-                var queueFbImgUrl = new Queue<string>();
-
-                if (imgNode != null)
-                {
-                    foreach (var imgNodeItem in imgNode)
-                    {
-                        var imageUrl = imgNodeItem.Attributes["src"].Value.Replace(";", "&");
-                        queueFbImgUrl.Enqueue(imageUrl);
-                    }
-                }
-
-                ReadOnlyCollection<IWebElement> userlistnode = chromeWebDriver.FindElements(By.ClassName("_4k8x"));
-                if (userlistnode.Count > 0)
-                {
-                    foreach (var itemurl in userlistnode)
-                    {
-                        itemurl.Click();
-                        Thread.Sleep(3000);
-                        string userName = itemurl.Text;
-                        listUsernameInfo.ListUsername = userName;
-
-                        string currentURL = chromeWebDriver.Url;
-                        var tempId = currentURL.Split('?')[1].Split('=')[1];
-                        listUsernameInfo.ListUserId = tempId;
-                        listUsernameInfo.InboxNavigationUrl = currentURL;
-                        var imgUrl = queueFbImgUrl.Dequeue();
-
-
-                        _dbHelper.InsertFacebookMessage( listUsernameInfo, userName, currentURL, imgUrl);
-                    }
-                }
-            }
-        }
-
-        public void GetFbMessengerMessages1()
-        {
             try
             {
-                _dbHelper =new DbHelper();
-                List<ListUsernameInfo> _MyListUsernameInfo = new List<ListUsernameInfo>();
-                Queue<string> myQueue = new Queue<string>();
-                var chromeWebDriver = GetDriver();
-                ListUsernameInfo listUsernameInfo = new ListUsernameInfo();
-                var PageSource = chromeWebDriver.PageSource;
-                Thread.Sleep(3000);
-                var htmlDocument = new HtmlDocument();
-                htmlDocument.LoadHtml(PageSource);
-                Thread.Sleep(3000);
-                HtmlNodeCollection imgNode =
-                    htmlDocument.DocumentNode.SelectNodes("//*[@id='u_0_t']/div/div/div/table/tbody/tr/td[1]/div/div[2]/div/div[1]/div/div/div/div/div/div/img");
-                       
-                if (imgNode != null)
+                ReadOnlyCollection<IWebElement> pageNodepageUrl = chromeWebDriver.FindElements((By.XPath("//*[@class='clearfix _1vh8']/a")));
+                if (pageNodepageUrl.Count > 0)
                 {
-                    foreach (var imgNodeItem in imgNode)
-                    {
-                        var Getimgurl = imgNodeItem.Attributes["src"].Value.Replace(";", "&");
-                        myQueue.Enqueue(Getimgurl);
-                    }
-                }
-                var listNodeElements = htmlDocument.DocumentNode.SelectNodes("//div[@class='_4ik4 _4ik5']");
 
-                ReadOnlyCollection<IWebElement> userlistnode = chromeWebDriver.FindElements(By.ClassName("_4k8x"));
-                if (userlistnode.Count > 0)
-                {
-                    foreach (var itemurl in userlistnode)
+
+                    foreach (var pageNodeItem in pageNodepageUrl)
                     {
-                        Thread.Sleep(3000);
-                        itemurl.Click();
-                        Thread.Sleep(3000);
-                        string userName = itemurl.Text;
-                        listUsernameInfo.ListUsername = userName;
-                        var currentURL = chromeWebDriver.Url;
-                        var tempId = currentURL.Split('?')[1].Split('=')[1];
-                        listUsernameInfo.ListUserId = tempId;
-                        listUsernameInfo.InboxNavigationUrl = currentURL;
-                        _MyListUsernameInfo.Add(listUsernameInfo);
-                        var imgUrl = myQueue.Dequeue();
-                        Thread.Sleep(3000);
-                        _dbHelper.InsertFbMessengerMessage(listUsernameInfo, userName, imgUrl);
-                     
+                        var TemppageNodeItem = pageNodeItem.GetAttribute("href");
+                        
+                        //fbPageInfo.FbPageUrl = TemppageNodeItem;
+                        LstPageUrl.Add(TemppageNodeItem);
+
+                        _queueFbCmntImgUrl.Enqueue(TemppageNodeItem);
                     }
+                    ArrayList arrlist1 = new ArrayList();
+                    ArrayList arrlist2 = new ArrayList();
+                    FbPageInfo fbPageInfo = new FbPageInfo();
+
+                var emailElement1 = chromeWebDriver.FindElements(By.XPath("//a[@class='_39g5']"));
+                    
+
+                        
+                        foreach (var item in emailElement1)
+                        {
+                            string lin1k = item.GetAttribute("href");
+                            if (item.GetAttribute("href").Contains("/live_video/launch_composer/?page_id="))
+                            {
+                                var pageId = lin1k.Replace("https://www.facebook.com/live_video/launch_composer/?page_id=", "");
+                                arrlist1.Add(pageId);
+                                //fbPageInfo.FbPageId = pageId;
+
+                            }
+                            if (item.GetAttribute("href").Contains("?modal=composer&ref=www_pages_browser_your_pages_section"))
+                            {
+                                string pageName = lin1k.Replace("https://www.facebook.com/", "").Replace("/?modal=composer&ref=www_pages_browser_your_pages_section", "");
+                                arrlist2.Add(pageName);
+
+                            }
+
+
+                           
+                        }
+                    for (int i = 0; i < _queueFbCmntImgUrl.Count; i++)
+                    {
+
+
+
+                        fbPageInfo.FbPageId= arrlist1[i].ToString();
+                        fbPageInfo.FbPageName = arrlist2[i].ToString();
+                        fbPageInfo.FbPageUrl = _queueFbCmntImgUrl.Dequeue();
+                        listFbPageInfo.Add(fbPageInfo);
+                   //     _dbHelper.GetLoginUsers();
+                   //     _dbHelper.AddFacebookPage(fbPageInfo.FbPageId,fbPageInfo.FbPageName,fbPageInfo.FbPageUrl,userName);
+
+                        
+                    }
+                    
+                    
+
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
 
-
             }
+
+
+
         }
 
-        public void GetInstaMesages1()
-        {
-            Queue<string> queueInstaImgUrl = new Queue<string>();
-
-            var chromeWebDriver = GetDriver();
-            Thread.Sleep(3000);
-            ListUsernameInfo listUsernameInfo = new ListUsernameInfo();
-            string url = "https://www.facebook.com/TP-1996120520653285/inbox/";
-            chromeWebDriver.Navigate().GoToUrl(url);
-            Thread.Sleep(3000);
-
-            ReadOnlyCollection<IWebElement> collection = chromeWebDriver.FindElements(By.ClassName("_32wr"));
-            {
-                if (collection.Count > 0)
-                {
-                    collection[2].Click();
-                    Thread.Sleep(3000);
-                }
-            }
-
-            ReadOnlyCollection<IWebElement> commentpostImgNodCollection =
-                chromeWebDriver.FindElements(By.XPath(".//*[@class='_11eg _5aj7']/div/div/img"));
-            if (commentpostImgNodCollection.Count > 0)
-            {
-                for (int i = 0; i < commentpostImgNodCollection.Count; i++)
-                {
-                    var DataImg = commentpostImgNodCollection[i].GetAttribute("src");
-                    queueInstaImgUrl.Enqueue(DataImg);
-                }
-            }
-
-            ReadOnlyCollection<IWebElement> userlistnode = chromeWebDriver.FindElements(By.ClassName("_4k8x"));
-            if (userlistnode.Count > 0)
-            {
-                foreach (var itemurl in userlistnode)
-                {
-                    itemurl.Click();
-                    Thread.Sleep(3000);
-                    string userName = itemurl.Text;
-                    listUsernameInfo.ListUsername = userName;
-
-                    var currentURL = chromeWebDriver.Url;
-                    var tempId = currentURL.Split('?')[1].Split('=')[1];
-                    listUsernameInfo.ListUserId = tempId;
-                    listUsernameInfo.InboxNavigationUrl = currentURL;
-
-                    var imgUrl = queueInstaImgUrl.Dequeue();
-                    _dbHelper.InsertInstagramMessage(userName, currentURL, imgUrl);
-
-                }
-            }
-        }
-
-
-       
-        private static void InsertFacebookCommentToDb(List<FbUserMessageInfo>  messagingFbpageListInfo)
+        public static void InsertFacebookCommentToDb(List<FbUserMessageInfo>  messagingFbpageListInfo)
         {
             for (int i = 0; i < messagingFbpageListInfo.Count; i++)
             {
@@ -367,9 +233,7 @@ namespace Fb_InstaWpf
                 }
             }
         }
-
-
-        private void GetInstaMesages()
+        public void GetInstaMesages()
         {
             List<FbUserMessageInfo> messagingFbpageListInfo = null;
             try
@@ -433,7 +297,7 @@ namespace Fb_InstaWpf
                 chromeWebDriver.Navigate().GoToUrl("https://www.facebook.com/TP-1996120520653285/inbox/?selected_item_id=1996142970651040");
 
                 Thread.Sleep(3000);
-                var pageSource = ChromeWebDriver.PageSource;
+                var pageSource = chromeWebDriver.PageSource;
                 var htmlDocument = new HtmlDocument();
                 htmlDocument.LoadHtml(pageSource);
                 Thread.Sleep(1000);
@@ -471,7 +335,7 @@ namespace Fb_InstaWpf
 
             }
         }
-        private void GetFbMessengerMessages()
+        public void GetFbMessengerMessages()
         {
 
             List<FbUserMessageInfo> messagingFbpageListInfo = null;
@@ -482,7 +346,7 @@ namespace Fb_InstaWpf
                 Queue<string> myQueue = new Queue<string>();
 
                 ListUsernameInfo listUsernameInfo = new ListUsernameInfo();
-                var PageSource = ChromeWebDriver.PageSource;
+                var PageSource = chromeWebDriver.PageSource;
 
                 var htmlDocument = new HtmlDocument();
                 htmlDocument.LoadHtml(PageSource);
@@ -500,7 +364,7 @@ namespace Fb_InstaWpf
                 }
                 var listNodeElements = htmlDocument.DocumentNode.SelectNodes("//div[@class='_4ik4 _4ik5']");
 
-                ReadOnlyCollection<IWebElement> userlistnode = ChromeWebDriver.FindElements(By.ClassName("_4k8x"));
+                ReadOnlyCollection<IWebElement> userlistnode = chromeWebDriver.FindElements(By.ClassName("_4k8x"));
                 if (userlistnode.Count > 0)
                 {
                     foreach (var itemurl in userlistnode)
@@ -510,7 +374,7 @@ namespace Fb_InstaWpf
                         // Thread.Sleep(3000);
                         string userName = itemurl.Text;
                         listUsernameInfo.ListUsername = userName;
-                        var currentURL = ChromeWebDriver.Url;
+                        var currentURL = chromeWebDriver.Url;
                         var tempId = currentURL.Split('?')[1].Split('=')[1];
                         listUsernameInfo.ListUserId = tempId;
                         listUsernameInfo.InboxNavigationUrl = currentURL;
@@ -524,10 +388,10 @@ namespace Fb_InstaWpf
 
 
 
-                ChromeWebDriver.Navigate().GoToUrl("https://www.facebook.com/TP-1996120520653285/inbox/?selected_item_id=1996233970641940");
+                chromeWebDriver.Navigate().GoToUrl("https://www.facebook.com/TP-1996120520653285/inbox/?selected_item_id=1996233970641940");
 
                 Thread.Sleep(3000);
-                var pageSource = ChromeWebDriver.PageSource;
+                var pageSource = chromeWebDriver.PageSource;
                 htmlDocument = new HtmlDocument();
                 htmlDocument.LoadHtml(pageSource);
 
@@ -569,15 +433,15 @@ namespace Fb_InstaWpf
                         messagingFbpageListInfo.Add(new FbUserMessageInfo { UserType = 2, otheruserFbimage = img });
                     }
                 }
-
+                _dbHelper.InsertFacebookCommentToDb(messagingFbpageListInfo);
             }
             catch (Exception)
             {
 
             }
-            _dbHelper.InsertFacebookCommentToDb(messagingFbpageListInfo);
+            
         }
-        private void GetFacebookMessages()
+        public void GetFacebookMessages()
         {
 
             try
@@ -586,7 +450,7 @@ namespace Fb_InstaWpf
                 Queue<string> myQueue = new Queue<string>();
 
                 ListUsernameInfo listUsernameInfo = new ListUsernameInfo();
-                var PageSource = ChromeWebDriver.PageSource;
+                var PageSource = chromeWebDriver.PageSource;
 
                 var htmlDocument = new HtmlDocument();
                 htmlDocument.LoadHtml(PageSource);
@@ -604,7 +468,7 @@ namespace Fb_InstaWpf
                 }
                 var listNodeElements = htmlDocument.DocumentNode.SelectNodes("//div[@class='_4ik4 _4ik5']");
 
-                ReadOnlyCollection<IWebElement> userlistnode = ChromeWebDriver.FindElements(By.ClassName("_4k8x"));
+                ReadOnlyCollection<IWebElement> userlistnode = chromeWebDriver.FindElements(By.ClassName("_4k8x"));
                 if (userlistnode.Count > 0)
                 {
                     foreach (var itemurl in userlistnode)
@@ -614,7 +478,7 @@ namespace Fb_InstaWpf
                         // Thread.Sleep(3000);
                         string userName = itemurl.Text;
                         listUsernameInfo.ListUsername = userName;
-                        var currentURL = ChromeWebDriver.Url;
+                        var currentURL = chromeWebDriver.Url;
                         var tempId = currentURL.Split('?')[1].Split('=')[1];
                         listUsernameInfo.ListUserId = tempId;
                         listUsernameInfo.InboxNavigationUrl = currentURL;
@@ -632,10 +496,10 @@ namespace Fb_InstaWpf
 
 
 
-                ChromeWebDriver.Navigate().GoToUrl("https://www.facebook.com/TP-1996120520653285/inbox/?selected_item_id=100002324267540");
+                chromeWebDriver.Navigate().GoToUrl("https://www.facebook.com/TP-1996120520653285/inbox/?selected_item_id=100002324267540");
                 Thread.Sleep(2000);
                 var plateformType = "1";
-                var pageSource = ChromeWebDriver.PageSource;
+                var pageSource = chromeWebDriver.PageSource;
                 htmlDocument = new HtmlDocument();
                 htmlDocument.LoadHtml(pageSource);
                 Thread.Sleep(2000);
@@ -645,7 +509,7 @@ namespace Fb_InstaWpf
 
                 foreach (HtmlNode htmlNodeDiv in imgNodee)
                 {
-                    var currentURL = ChromeWebDriver.Url;
+                    var currentURL = chromeWebDriver.Url;
                     var tempId = currentURL.Split('?')[1].Split('=')[1];
 
                     HtmlNode selectSingleNode = htmlNodeDiv.SelectSingleNode(".//div[@class='clearfix _o46 _3erg _29_7 direction_ltr text_align_ltr']");
