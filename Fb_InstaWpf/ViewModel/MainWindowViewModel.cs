@@ -240,25 +240,35 @@ namespace Fb_InstaWpf.ViewModel
             switch (parentTabName)
             {
                 case "Messenger":
-                    MessengerUserListViewModel?.SelectedUsers?.Remove(MessengerUserListViewModel.SelectedUsers.FirstOrDefault(m => m.InboxUserName == tabName));
+				if (MessengerUserListViewModel != null && MessengerUserListViewModel.SelectedUsers !=null ){
+				
+				
+                    MessengerUserListViewModel.SelectedUsers.Remove(MessengerUserListViewModel.SelectedUsers.FirstOrDefault(m => m.InboxUserName == tabName));
                     if (MessengerUserListViewModel.SelectedUsers.Count == 0)
                     {
                         MessengerUserListViewModel.SelectedItem = null;
                     }
+					}
                     break;
                 case "Facebook":
-                    FacebookUserListViewModel?.SelectedUsers?.Remove(FacebookUserListViewModel.SelectedUsers.FirstOrDefault(m => m.InboxUserName == tabName));
+				if (FacebookUserListViewModel != null && FacebookUserListViewModel.SelectedUsers !=null ){
+				
+                    FacebookUserListViewModel.SelectedUsers.Remove(FacebookUserListViewModel.SelectedUsers.FirstOrDefault(m => m.InboxUserName == tabName));
                     if (FacebookUserListViewModel.SelectedUsers.Count == 0)
                     {
                         FacebookUserListViewModel.SelectedItem = null;
                     }
+					}
                     break;
                 case "Instagram":
-                    InstagramUserListViewModel?.SelectedUsers?.Remove(InstagramUserListViewModel.SelectedUsers.FirstOrDefault(m => m.InboxUserName == tabName));
+				if (InstagramUserListViewModel != null && InstagramUserListViewModel.SelectedUsers !=null ){
+				
+                    InstagramUserListViewModel.SelectedUsers.Remove(InstagramUserListViewModel.SelectedUsers.FirstOrDefault(m => m.InboxUserName == tabName));
                     if (InstagramUserListViewModel.SelectedUsers.Count == 0)
                     {
                         InstagramUserListViewModel.SelectedItem = null;
                     }
+					}
                     break;
 
                 default:
