@@ -144,10 +144,14 @@ namespace Fb_InstaWpf.ViewModel
 
         private void _onlineFetcher_LoginSuccessEvent()
         {
+          //  _onlineFetcher.GetFacebookMessages();
+            //_onlineFetcher.GetFbMessengerMessages();
+            //  _onlineFetcher.GetInstaMesages();
+            _onlineFetcherFacebookMessengerTask = Task.Factory.StartNew(() => _onlineFetcher.GetFbMessengerMessages());
             _onlineFetcherGetAllPagesTask = Task.Factory.StartNew(() => _onlineFetcher.GetFacebookMessages());
             _onlineFetcherInstagramMessagesTask = Task.Factory.StartNew(() => _onlineFetcher.GetInstaMesages());
-            _onlineFetcherFacebookMessengerTask = Task.Factory.StartNew(() => _onlineFetcher.GetFbMessengerMessages());
-            _onlinePosterTask = Task.Factory.StartNew(() => _onlinePoster.ProcessMessage());
+
+            //_onlinePosterTask = Task.Factory.StartNew(() => _onlinePoster.ProcessMessage());
         }
 
         private void FillLoginUserList()

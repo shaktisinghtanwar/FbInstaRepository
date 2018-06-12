@@ -249,9 +249,15 @@ namespace Fb_InstaWpf
 
    
 
-        internal void InsertFacebookCommentToDb(List<FbUserMessageInfo> messagingFbpageListInfo)
+        public void InsertFacebookCommentToDb(List<FbUserMessageInfo> messagingFbpageListInfo,string userId)
         {
-            throw new NotImplementedException();
+            var sql = GetSqliteHelper();
+            foreach (var messagingFbpageListInfoItem in messagingFbpageListInfo)
+            {
+                string query = "Insert into Messages(FromUserId,ToUserId,Message,MessageType,MessageDate,ImagePath) values('" + messagingFbpageListInfoItem.otheruserId + "','" + userId + "','" + messagingFbpageListInfoItem.Message + "','" + messagingFbpageListInfoItem.UserType + "','" + messagingFbpageListInfoItem.OtherUserDateTime + "','" + messagingFbpageListInfoItem.loginguserFbimage + "')";
+            int yy = sql.ExecuteNonQuery(query);
+            }
+          
         }
 
 
@@ -266,11 +272,7 @@ namespace Fb_InstaWpf
             var dt = GetSqliteHelper().GetDataTable(query);
             foreach (DataRow item in dt.Rows)
             {
-                //string inboxUserId = Convert.ToString(item["M_InboxUserId"]);
-                //string PlateformType = Convert.ToString(item["PlateformType"]);
-                //string PostType = Convert.ToString(item["PostType"]);
-                //string Message = Convert.ToString(item["Message"]);
-                //string ImgSource = Convert.ToString(item["ImgSource"]);
+               
                 string inboxUserId = Convert.ToString(item["FromUserId"]);
                 string ToUserId = Convert.ToString(item["ToUserId"]);
                 string Message = Convert.ToString(item["Message"]);

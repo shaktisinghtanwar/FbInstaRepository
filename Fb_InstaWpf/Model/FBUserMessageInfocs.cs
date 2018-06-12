@@ -12,7 +12,9 @@ namespace Fb_InstaWpf.Model
         public string UserName { get; set; }
         public int UserType { get; set; }//0 Login User 1 for Other user
         public string Message { get; set; }
-        public string Time { get; set; }
+        public string OtherUserDateTime { get; set; }
+
+        public string otheruserId { get; set; }
         public string otheruserimage { get; set; }
         public string loginguserimage { get; set; }
     
@@ -22,6 +24,7 @@ namespace Fb_InstaWpf.Model
       
       public string loginguserInstaimage { get; set; }
       public string otheruserInstaimage { get; set; }
+   
 
     }
 

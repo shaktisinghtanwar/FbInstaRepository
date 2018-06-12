@@ -104,26 +104,19 @@ namespace Fb_InstaWpf
                             {
                                 string pageName = lin1k.Replace("https://www.facebook.com/", "").Replace("/?modal=composer&ref=www_pages_browser_your_pages_section", "");
                             }
-
+                           
                         }
                     }
                     catch (Exception)
                     {
 
                     }
-                   // GetAllPaLoggedinUserPages();
-
+                  
                     Thread.Sleep(5000);
-                    // ShowMessengerListData();
-                    ////GetFbMessengerMessages();
-                    ////Thread.Sleep(2000);
                     LoginSuccessEvent();
                     _cookieJar = chromeWebDriver.Manage().Cookies;
-
                     isLoggedIn = true;
                     Thread.Sleep(2000);
-
-                    // Image.Visibility = Visibility.Hidden;
                 }
 
             }
@@ -133,21 +126,17 @@ namespace Fb_InstaWpf
                 //;
             }
         }
-
+        List<FbUserMessageInfo> messagingFbpageListInfo=new List<FbUserMessageInfo>();
         public void GetAllPaLoggedinUserPages(string userName)
         {
             var listFbPageInfo = new List<FbPageInfo>();
            //var chromeWebDriver = GetDriver();
             chromeWebDriver.Navigate().GoToUrl("https://www.facebook.com/pages/?category=your_pages");
-            
-
             try
             {
                 ReadOnlyCollection<IWebElement> pageNodepageUrl = chromeWebDriver.FindElements((By.XPath("//*[@class='clearfix _1vh8']/a")));
                 if (pageNodepageUrl.Count > 0)
                 {
-
-
                     foreach (var pageNodeItem in pageNodepageUrl)
                     {
                         var TemppageNodeItem = pageNodeItem.GetAttribute("href");
@@ -162,9 +151,6 @@ namespace Fb_InstaWpf
                     FbPageInfo fbPageInfo = new FbPageInfo();
 
                 var emailElement1 = chromeWebDriver.FindElements(By.XPath("//a[@class='_39g5']"));
-                    
-
-                        
                         foreach (var item in emailElement1)
                         {
                             string lin1k = item.GetAttribute("href");
@@ -181,26 +167,18 @@ namespace Fb_InstaWpf
                                 arrlist2.Add(pageName);
 
                             }
-
-
                            
                         }
                     for (int i = 0; i < _queueFbCmntImgUrl.Count; i++)
                     {
-
-
-
                         fbPageInfo.FbPageId= arrlist1[i].ToString();
                         fbPageInfo.FbPageName = arrlist2[i].ToString();
                         fbPageInfo.FbPageUrl = _queueFbCmntImgUrl.Dequeue();
                         listFbPageInfo.Add(fbPageInfo);
                    //     _dbHelper.GetLoginUsers();
                         _dbHelper.AddFacebookPage(fbPageInfo.FbPageId,fbPageInfo.FbPageName,fbPageInfo.FbPageUrl,userName);
-
                         
                     }
-                    
-                    
 
                 }
             }
@@ -208,8 +186,6 @@ namespace Fb_InstaWpf
             {
 
             }
-
-
 
         }
 
@@ -235,14 +211,12 @@ namespace Fb_InstaWpf
         }
         public void GetInstaMesages()
         {
-            List<FbUserMessageInfo> messagingFbpageListInfo = null;
+            messagingFbpageListInfo = new List<FbUserMessageInfo>();
             try
             {
-
-
                 Queue<string> queueInstaImgUrl = new Queue<string>();
 
-                var chromeWebDriver = GetDriver();
+                //var chromeWebDriver = GetDriver();
                 Thread.Sleep(3000);
                 ListUsernameInfo listUsernameInfo = new ListUsernameInfo();
                 string url = "https://www.facebook.com/TP-1996120520653285/inbox/";
@@ -257,6 +231,15 @@ namespace Fb_InstaWpf
                         Thread.Sleep(3000);
                     }
                 }
+
+                 ReadOnlyCollection<IWebElement> profilIdtempnode = chromeWebDriver.FindElements(By.XPath("//div[@data-click='profile_icon']/a"));
+                if (profilIdtempnode.Count > 0)
+                {
+                    var urls = profilIdtempnode[0].GetAttribute("href").ToString();
+                    profilIdtempinsta = urls.Split('?')[1].Split('=')[1].ToString();
+                }
+
+
 
                 ReadOnlyCollection<IWebElement> commentpostImgNodCollection =
                     chromeWebDriver.FindElements(By.XPath(".//*[@class='_11eg _5aj7']/div/div/img"));
@@ -287,47 +270,51 @@ namespace Fb_InstaWpf
                         var imgUrl = queueInstaImgUrl.Dequeue();
                         _dbHelper.InsertInstagramMessage(userName, currentURL, imgUrl);
 
+
+
+                        Thread.Sleep(3000);
+                        var pageSource = chromeWebDriver.PageSource;
+                        var htmlDocument = new HtmlDocument();
+                        htmlDocument.LoadHtml(pageSource);
+                        Thread.Sleep(1000);
+                        HtmlNodeCollection commentNode = htmlDocument.DocumentNode.SelectNodes("//div[@class='_4cye _4-u2  _4-u8']");
+                        messagingFbpageListInfo = new List<FbUserMessageInfo>();
+                        foreach (HtmlNode htmlcommentNode in commentNode)
+                        {
+                            HtmlNode selectNode = htmlcommentNode.SelectSingleNode("//div[@class='_4cyh']");
+                            var pagename = selectNode.InnerText;
+                            messagingFbpageListInfo.Add(new FbUserMessageInfo { UserType = 0, Message = pagename });
+
+                            HtmlNode pageimg = htmlcommentNode.SelectSingleNode("//img[@class='img']");
+
+                            var imgsrc = pageimg.Attributes["src"].Value.Replace(";", "&");
+                            messagingFbpageListInfo.Add(new FbUserMessageInfo { UserType = 3, loginguserFbimage = imgsrc });
+                        }
+
+                        HtmlNodeCollection commentBlock = htmlDocument.DocumentNode.SelectNodes("//div[@class='_3i4- _5aj7']");
+                        var commentImg = string.Empty;
+                        foreach (HtmlNode commentitem in commentBlock)
+                        {
+                            var usernameAndComment = commentitem.InnerText.Split();
+                            var ccomment = usernameAndComment[0];
+
+                            Regex timeRegex = new Regex(@"utime=(.*?)<");
+                            Match matchtime = timeRegex.Match(commentitem.OuterHtml);
+                            string msgTimeng = matchtime.Value.Replace("utime=", "").Replace("<", "");
+                            var instaCommentTime = msgTimeng.Split('>')[1];
+
+                        }
+
+
+                        _dbHelper.InsertFacebookCommentToDb(messagingFbpageListInfo, profilIdtempinsta);
                     }
                 }
-
-
 
                 // var chromeWebDriver = GetDriver();
                 // chromeWebDriver.Navigate().GoToUrl(SelectedFBPageInfo.FBInboxNavigationUrl); navigationUrl
                 chromeWebDriver.Navigate().GoToUrl("https://www.facebook.com/TP-1996120520653285/inbox/?selected_item_id=1996142970651040");
 
-                Thread.Sleep(3000);
-                var pageSource = chromeWebDriver.PageSource;
-                var htmlDocument = new HtmlDocument();
-                htmlDocument.LoadHtml(pageSource);
-                Thread.Sleep(1000);
-                HtmlNodeCollection commentNode = htmlDocument.DocumentNode.SelectNodes("//div[@class='_4cye _4-u2  _4-u8']");
-                messagingFbpageListInfo = new List<FbUserMessageInfo>();
-                foreach (HtmlNode htmlcommentNode in commentNode)
-                {
-                    HtmlNode selectNode = htmlcommentNode.SelectSingleNode("//div[@class='_4cyh']");
-                    var pagename = selectNode.InnerText;
-                    messagingFbpageListInfo.Add(new FbUserMessageInfo { UserType = 0, Message = pagename });
-
-                    HtmlNode pageimg = htmlcommentNode.SelectSingleNode("//img[@class='img']");
-
-                    var imgsrc = pageimg.Attributes["src"].Value.Replace(";", "&");
-                    messagingFbpageListInfo.Add(new FbUserMessageInfo { UserType = 3, loginguserFbimage = imgsrc });
-                }
-
-                HtmlNodeCollection commentBlock = htmlDocument.DocumentNode.SelectNodes("//div[@class='_3i4- _5aj7']");
-                var commentImg = string.Empty;
-                foreach (HtmlNode commentitem in commentBlock)
-                {
-                    var usernameAndComment = commentitem.InnerText.Split();
-                    var ccomment = usernameAndComment[0];
-
-                    Regex timeRegex = new Regex(@"utime=(.*?)<");
-                    Match matchtime = timeRegex.Match(commentitem.OuterHtml);
-                    string msgTimeng = matchtime.Value.Replace("utime=", "").Replace("<", "");
-                    var instaCommentTime = msgTimeng.Split('>')[1];
-
-                }
+                
 
             }
             catch (Exception)
@@ -335,15 +322,28 @@ namespace Fb_InstaWpf
 
             }
         }
-        public void GetFbMessengerMessages()
+        public void GetFacebookMessages()
         {
-
-            List<FbUserMessageInfo> messagingFbpageListInfo = null;
+            messagingFbpageListInfo = new List<FbUserMessageInfo>(); ;
             try
             {
 
                 List<ListUsernameInfo> _MyListUsernameInfo = new List<ListUsernameInfo>();
                 Queue<string> myQueue = new Queue<string>();
+                string url = "https://www.facebook.com/TP-1996120520653285/inbox/";
+                chromeWebDriver.Navigate().GoToUrl(url);
+                Thread.Sleep(3000);
+                ReadOnlyCollection<IWebElement> LeftTabTempnode = chromeWebDriver.FindElements(By.ClassName("_32wr"));
+                if (LeftTabTempnode.Count>0)
+                {
+                    LeftTabTempnode[1].Click();
+                }
+                ReadOnlyCollection<IWebElement> profilIdtempnode = chromeWebDriver.FindElements(By.XPath("//div[@data-click='profile_icon']/a"));
+                if (profilIdtempnode.Count > 0)
+                {
+                    var urls = profilIdtempnode[0].GetAttribute("href").ToString();
+                  profilIdtempFb = urls.Split('?')[1].Split('=')[1].ToString();
+                }
 
                 ListUsernameInfo listUsernameInfo = new ListUsernameInfo();
                 var PageSource = chromeWebDriver.PageSource;
@@ -382,58 +382,67 @@ namespace Fb_InstaWpf
                         var imgUrl = myQueue.Dequeue();
                         _dbHelper.InsertFbMessengerMessage(listUsernameInfo, userName, imgUrl);
 
+
+                        ///////////////
+                        Thread.Sleep(3000);
+                        chromeWebDriver.Navigate().GoToUrl(currentURL);
+                        var pageSource = chromeWebDriver.PageSource;
+                        htmlDocument = new HtmlDocument();
+                        htmlDocument.LoadHtml(pageSource);
+
+                        HtmlNodeCollection commentNode = htmlDocument.DocumentNode.SelectNodes("//div[@class='_5v3q _5jmm _5pat _11m5']");
+                        messagingFbpageListInfo = new List<FbUserMessageInfo>();
+                        foreach (HtmlNode htmlcommentNode in commentNode)
+                        {
+                            HtmlNode selectNode = htmlcommentNode.SelectSingleNode("//div[@class='_4vv0 _3ccb']");
+                            var pagename = selectNode.InnerText;
+                            messagingFbpageListInfo.Add(new FbUserMessageInfo { UserType = 0, Message = pagename, otheruserId = tempId });
+
+                            HtmlNode pageimg = htmlcommentNode.SelectSingleNode("//img[@class='scaledImageFitWidth img']");
+
+                            var imgsrc = pageimg.Attributes["src"].Value.Replace(";", "&");
+                            messagingFbpageListInfo.Add(new FbUserMessageInfo { UserType = 3, loginguserFbimage = imgsrc, otheruserId = tempId });
+                        }
+
+                        HtmlNodeCollection commentBlock = htmlDocument.DocumentNode.SelectNodes("//div[@class='UFIImageBlockContent _42ef']");
+                        var commentImg = string.Empty;
+                        foreach (HtmlNode commentitem in commentBlock)
+                        {
+                            var pagenamee = commentitem.InnerText;
+                            var comment = pagenamee.Replace("ManageLikeShow More Reactions ", "").Split('·');
+                            var fbComment = comment[0];
+
+                            Regex timeRegex = new Regex(@"title=(.*?)data");
+                            Match matchtime = timeRegex.Match(commentitem.OuterHtml);
+                            string msgTimeng = matchtime.Value.Replace("title=", "").Replace("data", "").Replace(@"""", "");
+
+
+
+                            Regex regex = new Regex(@"src(.*?)alt");
+                            Match match = regex.Match(commentitem.InnerHtml);
+                            if (match.Length != 0)
+                            {
+                                string[] msgId = match.Value.Replace(";", "&").Split('"');
+                                var img = msgId[1];
+
+                                messagingFbpageListInfo.Add(new FbUserMessageInfo { UserType = 2, otheruserFbimage = img, otheruserId = tempId });
+                            }
+                        }
+                        _dbHelper.InsertFacebookCommentToDb(messagingFbpageListInfo, profilIdtempFb);
+                        ///////////////
+
+
+
+
+
+
+
                     }
                 }
 
+                //chromeWebDriver.Navigate().GoToUrl("https://www.facebook.com/TP-1996120520653285/inbox/?selected_item_id=1996233970641940");
 
-
-
-                chromeWebDriver.Navigate().GoToUrl("https://www.facebook.com/TP-1996120520653285/inbox/?selected_item_id=1996233970641940");
-
-                Thread.Sleep(3000);
-                var pageSource = chromeWebDriver.PageSource;
-                htmlDocument = new HtmlDocument();
-                htmlDocument.LoadHtml(pageSource);
-
-                HtmlNodeCollection commentNode = htmlDocument.DocumentNode.SelectNodes("//div[@class='_5v3q _5jmm _5pat _11m5']");
-                messagingFbpageListInfo = new List<FbUserMessageInfo>();
-                foreach (HtmlNode htmlcommentNode in commentNode)
-                {
-                    HtmlNode selectNode = htmlcommentNode.SelectSingleNode("//div[@class='_4vv0 _3ccb']");
-                    var pagename = selectNode.InnerText;
-                    messagingFbpageListInfo.Add(new FbUserMessageInfo { UserType = 0, Message = pagename });
-
-                    HtmlNode pageimg = htmlcommentNode.SelectSingleNode("//img[@class='scaledImageFitWidth img']");
-
-                    var imgsrc = pageimg.Attributes["src"].Value.Replace(";", "&");
-                    messagingFbpageListInfo.Add(new FbUserMessageInfo { UserType = 3, loginguserFbimage = imgsrc });
-                }
-
-                HtmlNodeCollection commentBlock = htmlDocument.DocumentNode.SelectNodes("//div[@class='UFIImageBlockContent _42ef']");
-                var commentImg = string.Empty;
-                foreach (HtmlNode commentitem in commentBlock)
-                {
-                    var pagenamee = commentitem.InnerText;
-                    var comment = pagenamee.Replace("ManageLikeShow More Reactions ", "").Split('·');
-                    var fbComment = comment[0];
-
-                    Regex timeRegex = new Regex(@"title=(.*?)data");
-                    Match matchtime = timeRegex.Match(commentitem.OuterHtml);
-                    string msgTimeng = matchtime.Value.Replace("title=", "").Replace("data", "").Replace(@"""", "");
-
-
-
-                    Regex regex = new Regex(@"src(.*?)alt");
-                    Match match = regex.Match(commentitem.InnerHtml);
-                    if (match.Length != 0)
-                    {
-                        string[] msgId = match.Value.Replace(";", "&").Split('"');
-                        var img = msgId[1];
-
-                        messagingFbpageListInfo.Add(new FbUserMessageInfo { UserType = 2, otheruserFbimage = img });
-                    }
-                }
-                _dbHelper.InsertFacebookCommentToDb(messagingFbpageListInfo);
+            
             }
             catch (Exception)
             {
@@ -441,17 +450,39 @@ namespace Fb_InstaWpf
             }
             
         }
-        public void GetFacebookMessages()
+
+        //GetFacebookMessages
+        //GetFbMessengerMessages
+
+
+
+        public void GetFbMessengerMessages()
         {
 
             try
             {
                 List<ListUsernameInfo> _MyListUsernameInfo = new List<ListUsernameInfo>();
                 Queue<string> myQueue = new Queue<string>();
-
                 ListUsernameInfo listUsernameInfo = new ListUsernameInfo();
-                var PageSource = chromeWebDriver.PageSource;
+                string url = "https://www.facebook.com/TP-1996120520653285/inbox/";
+                chromeWebDriver.Navigate().GoToUrl(url);
 
+               
+                ReadOnlyCollection<IWebElement> LeftTabTempnode = chromeWebDriver.FindElements(By.ClassName("_32wr"));
+                if (LeftTabTempnode.Count > 0)
+                {
+                    LeftTabTempnode[0].Click();
+                }
+
+                ReadOnlyCollection<IWebElement> profilIdtempnode = chromeWebDriver.FindElements(By.XPath("//div[@data-click='profile_icon']/a"));
+                if (profilIdtempnode.Count > 0)
+                {
+                    var urls = profilIdtempnode[0].GetAttribute("href").ToString();
+                    profilIdtempmsngr = urls.Split('?')[1].Split('=')[1].ToString();
+                }
+
+                var PageSource = chromeWebDriver.PageSource;
+              
                 var htmlDocument = new HtmlDocument();
                 htmlDocument.LoadHtml(PageSource);
 
@@ -487,82 +518,82 @@ namespace Fb_InstaWpf
 
                         _dbHelper.InsertFbMessengerMessage(listUsernameInfo, userName, imgUrl);
 
+
+                        Thread.Sleep(2000);
+                        var plateformType = "1";
+                        var pageSource = chromeWebDriver.PageSource;
+                        htmlDocument = new HtmlDocument();
+                        htmlDocument.LoadHtml(pageSource);
+                        Thread.Sleep(2000);
+
+
+                        HtmlNodeCollection imgNodee = htmlDocument.DocumentNode.SelectNodes("//div[@class='_41ud']");
+
+                        foreach (HtmlNode htmlNodeDiv in imgNodee)
+                        {
+                            
+
+                            var selectSingleNode = htmlNodeDiv.SelectSingleNode("//div[@class='clearfix _o46 _3erg _29_7 direction_ltr text_align_ltr']");
+
+                            if (selectSingleNode != null)
+                            {
+                                string otheruser = selectSingleNode.InnerText;
+
+                                Regex timeRegex = new Regex(@"data-tooltip-content(.*?)data");
+                                Match match1 = timeRegex.Match(selectSingleNode.OuterHtml);
+                                string msgTimeng = match1.Value.Replace("data-tooltip-content=", "").Replace("data", "").Replace(@"""", "");
+                                messagingFbpageListInfo.Add(new FbUserMessageInfo { UserType = 1, Message = otheruser, OtherUserDateTime = msgTimeng });
+
+                            }
+
+                            var selectSingleimgNode = htmlNodeDiv.SelectSingleNode(".//*[@class='clearfix _o46 _3erg _29_7 direction_ltr text_align_ltr _ylc']");
+                            if (selectSingleimgNode != null)
+                            {
+                                Regex regex = new Regex(@"src(.*?)style");
+                                Match match = regex.Match(selectSingleimgNode.InnerHtml);
+                                string imgId = match.Value.Replace("src=", "").Replace("style", "").Replace("\"", "").Replace(@"""", "").Replace("amp;", "");
+
+                                Regex timeRegex = new Regex(@"data-tooltip-content(.*?)data");
+                                Match match1 = timeRegex.Match(selectSingleimgNode.OuterHtml);
+                                string msgTimeng = match1.Value.Replace("data-tooltip-content=", "").Replace("data", "").Replace(@"""", "");
+                                messagingFbpageListInfo.Add(new FbUserMessageInfo { UserType = 1, OtherUserDateTime = msgTimeng, otheruserimage = imgId });
+
+                            }
+                            var selectSingleNode2 = htmlNodeDiv.SelectSingleNode(".//*[@class='clearfix _o46 _3erg _3i_m _nd_ direction_ltr text_align_ltr']");
+                            if (selectSingleNode2 != null)
+                            {
+                                string loginuser = selectSingleNode2.InnerText;
+
+                                Regex timeRegex = new Regex(@"data-tooltip-content(.*?)data");
+                                Match match = timeRegex.Match(selectSingleNode2.OuterHtml);
+                                string msgTimeng = match.Value.Replace("data-tooltip-content=", "").Replace("data", "").Replace(@"""", "");
+                                messagingFbpageListInfo.Add(new FbUserMessageInfo { UserType = 0, Message = loginuser, OtherUserDateTime = msgTimeng});
+                            }
+
+                            HtmlNode selectSingleimgRightNode = htmlNodeDiv.SelectSingleNode(".//*[@class='clearfix _o46 _3erg _3i_m _nd_ direction_ltr text_align_ltr _ylc']");
+                            if (selectSingleimgRightNode != null)
+                            {
+                                Regex regex = new Regex(@"src(.*?)style");
+                                Match match = regex.Match(selectSingleimgRightNode.InnerHtml);
+                                string msgId = match.Value.Replace("src=", "").Replace("style", "").Replace("\"", "").Replace(@"""", "").Replace("amp;", "");
+
+
+                                Regex timeRegex = new Regex(@"data-tooltip-content(.*?)data");
+                                Match match1 = timeRegex.Match(selectSingleimgRightNode.OuterHtml);
+                                string msgTimeng = match1.Value.Replace("data-tooltip-content=", "").Replace("data", "").Replace(@"""", "");
+                                messagingFbpageListInfo.Add(new FbUserMessageInfo { UserType = 0, loginguserimage = msgId, OtherUserDateTime = msgTimeng });
+                            }
+                            _dbHelper.InsertFacebookCommentToDb(messagingFbpageListInfo, profilIdtempmsngr);
+                        }
+
+
+
+
                     }
                 }
-
-
-
-
-
-
 
                 chromeWebDriver.Navigate().GoToUrl("https://www.facebook.com/TP-1996120520653285/inbox/?selected_item_id=100002324267540");
-                Thread.Sleep(2000);
-                var plateformType = "1";
-                var pageSource = chromeWebDriver.PageSource;
-                htmlDocument = new HtmlDocument();
-                htmlDocument.LoadHtml(pageSource);
-                Thread.Sleep(2000);
-
-
-                HtmlNodeCollection imgNodee = htmlDocument.DocumentNode.SelectNodes("//div[@class='_41ud']");
-
-                foreach (HtmlNode htmlNodeDiv in imgNodee)
-                {
-                    var currentURL = chromeWebDriver.Url;
-                    var tempId = currentURL.Split('?')[1].Split('=')[1];
-
-                    HtmlNode selectSingleNode = htmlNodeDiv.SelectSingleNode(".//div[@class='clearfix _o46 _3erg _29_7 direction_ltr text_align_ltr']");
-
-                    if (selectSingleNode != null)
-                    {
-                        string otheruser = selectSingleNode.InnerText;
-
-                        Regex timeRegex = new Regex(@"data-tooltip-content(.*?)data");
-                        Match match1 = timeRegex.Match(selectSingleNode.OuterHtml);
-                        string msgTimeng = match1.Value.Replace("data-tooltip-content=", "").Replace("data", "").Replace(@"""", "");
-
-
-                    }
-
-                    HtmlNode selectSingleimgNode = htmlNodeDiv.SelectSingleNode(".//*[@class='clearfix _o46 _3erg _29_7 direction_ltr text_align_ltr _ylc']");
-                    if (selectSingleimgNode != null)
-                    {
-                        Regex regex = new Regex(@"src(.*?)style");
-                        Match match = regex.Match(selectSingleimgNode.InnerHtml);
-                        string msgId = match.Value.Replace("src=", "").Replace("style", "").Replace("\"", "").Replace(@"""", "").Replace("amp;", "");
-
-                        Regex timeRegex = new Regex(@"data-tooltip-content(.*?)data");
-                        Match match1 = timeRegex.Match(selectSingleimgNode.OuterHtml);
-                        string msgTimeng = match1.Value.Replace("data-tooltip-content=", "").Replace("data", "").Replace(@"""", "");
-
-
-                    }
-                    HtmlNode selectSingleNode2 = htmlNodeDiv.SelectSingleNode(".//*[@class='clearfix _o46 _3erg _3i_m _nd_ direction_ltr text_align_ltr']");
-                    if (selectSingleNode2 != null)
-                    {
-                        string loginuser = selectSingleNode2.InnerText;
-
-                        Regex timeRegex = new Regex(@"data-tooltip-content(.*?)data");
-                        Match match = timeRegex.Match(selectSingleNode2.OuterHtml);
-                        string msgTimeng = match.Value.Replace("data-tooltip-content=", "").Replace("data", "").Replace(@"""", "");
-                    }
-
-                    HtmlNode selectSingleimgRightNode = htmlNodeDiv.SelectSingleNode(".//*[@class='clearfix _o46 _3erg _3i_m _nd_ direction_ltr text_align_ltr _ylc']");
-                    if (selectSingleimgRightNode != null)
-                    {
-                        Regex regex = new Regex(@"src(.*?)style");
-                        Match match = regex.Match(selectSingleimgRightNode.InnerHtml);
-                        string msgId = match.Value.Replace("src=", "").Replace("style", "").Replace("\"", "").Replace(@"""", "").Replace("amp;", "");
-
-
-                        Regex timeRegex = new Regex(@"data-tooltip-content(.*?)data");
-                        Match match1 = timeRegex.Match(selectSingleimgRightNode.OuterHtml);
-                        string msgTimeng = match1.Value.Replace("data-tooltip-content=", "").Replace("data", "").Replace(@"""", "");
-
-                    }
-
-                }
+               
                 Thread.Sleep(1000);
 
                 //for (int i = 0; i < MessagingListInfo.Count; i++)
@@ -595,6 +626,12 @@ namespace Fb_InstaWpf
         }
 
 
-        
+
+
+        public string profilIdtempmsngr { get; set; }
+
+        public string profilIdtempinsta { get; set; }
+
+        public string profilIdtempFb { get; set; }
     }
 }
