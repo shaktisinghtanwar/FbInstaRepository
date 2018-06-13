@@ -11,6 +11,7 @@ using System.Threading;
 using HtmlAgilityPack;
 using Fb_InstaWpf.DbModel;
 using Fb_InstaWpf.Enums;
+using Fb_InstaWpf.ViewModel;
 
 namespace Fb_InstaWpf
 {
@@ -26,6 +27,8 @@ namespace Fb_InstaWpf
         {
             return new SqLiteHelper();
         }
+
+		
         public void Add(PostMessage message)
         {
             //ObservableCollection<FbUserMessageInfo> messagingListInfo = new ObservableCollection<FbUserMessageInfo>();
@@ -56,6 +59,7 @@ namespace Fb_InstaWpf
             }
 
         }
+
 
         public ObservableCollection<SocialUser> GetLoginUsers()
         {

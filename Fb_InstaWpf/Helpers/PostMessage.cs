@@ -9,11 +9,24 @@
         public MessageType MessageType { get; set; }
 
         public string ImagePath { get; set; }
+
         public string ToUserId { get; internal set; }
         public int Status { get; set; }
         public string ToUrl { get; set; }
        
 
         
+
+		public int Id {get;set;}
+				
+		public int Status {get;set;}
+
+		public string ToUrl {get;set;}
+
+		public int MessageTypeResponse
+		{
+			get;
+			set;
+		}		
     }
 }
