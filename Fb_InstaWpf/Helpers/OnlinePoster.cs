@@ -4,12 +4,15 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Threading;
+using Fb_InstaWpf.Enums;
 
 namespace Fb_InstaWpf
 {
     public class OnlinePoster
     {
         ConcurrentQueue<PostMessage> _producerConsumerCollection;
+		public event Action MessagePosterEvent;
+		private int flag=0;
 
         public OnlinePoster()
         {
@@ -17,6 +20,19 @@ namespace Fb_InstaWpf
 
            // RestartThread();
         }
+		public void ProcessMessage()
+		{
+		      DbHelper dbHelper = new DbHelper();
+			  ObservableCollection<PostMessage> dataResponse = dbHelper.GetMessages();
+			  foreach (var item in dataResponse)
+			  {
+				 if(TryMessagePosting(item)) {
+				  dbHelper.UpdateMessageTable(item.Id) ;			
+				  MessagePosterEvent();        			  
+				 }
+			  }			 
+		}
+
       //
         //public void ProcessMessage()
         //{
@@ -50,22 +66,28 @@ namespace Fb_InstaWpf
         //}
 
         private  bool TryMessagePosting(PostMessage message)
-        {
-            switch (message.MessageType)
+		{
+			try {
+			  switch (message.MessageTypeResponse)
             {
-                case MessageType.FacebookMessage:
+                case 1:
                     return TryPostMessageToFacebook(message);
-                case MessageType.FacebookImage:
+                case 2:
                     return TryPostImageToFacebook(message);
-                case MessageType.InstaMessage:
+                case 3:
                     return TryPostMessageToInsta(message);
-                case MessageType.FacebookMessengerMessage:
+                case 4:
                     return TryPostMessageToFBMessenger(message);
-                case MessageType.FacebookMessengerImage:
+                case 5:
                     return TryPostImageToFBMessenger(message);
                 default:
                     return false;
             }
+			}
+			catch(Exception ex) {
+			}
+			return true;
+		 
         }
         public  ChromeDriver GetDriver()
         {
@@ -75,26 +97,26 @@ namespace Fb_InstaWpf
         public bool TryPostMessageToFBMessenger(PostMessage message)
         {
             try
-            {
-                 var chromeWebDriver = GetDriver();
-                chromeWebDriver.Navigate().GoToUrl("https://www.facebook.com/TP-1996120520653285/inbox/?selected_item_id=100002324267540");
+            {			  
+                var chromeWebDriver = GetDriver();
+				string url = message.ToUrl;
+				chromeWebDriver.Navigate().GoToUrl(url); 
+				OnlineFetcher.SetCookies(chromeWebDriver);				
+				chromeWebDriver.Navigate().GoToUrl(url);                
                 Thread.Sleep(2000);
-                OnlineFetcher.SetCookies(chromeWebDriver);
-                chromeWebDriver.Navigate().GoToUrl("https://www.facebook.com/TP-1996120520653285/inbox/?selected_item_id=100002324267540");
+                
 
                 //  ChromeWebDriver.Navigate().GoToUrl("https://www.facebook.com/pages/?category=your_pages");
                 string pageSource = chromeWebDriver.PageSource;
-
-
-                ReadOnlyCollection<IWebElement> writeNode =
-                       chromeWebDriver.FindElements(By.XPath("//*[@placeholder='Write a reply...']"));
+								
+				ReadOnlyCollection<IWebElement> writeNode =
+                chromeWebDriver.FindElements(By.XPath("//*[@placeholder='Write a reply...']"));
                 if (writeNode.Count > 0)
                 {
                     Thread.Sleep(2000);
                     writeNode[0].SendKeys(message.Message);
                     Thread.Sleep(2000);
                 }
-
                 ReadOnlyCollection<IWebElement> submitnode =
                        chromeWebDriver.FindElements(By.XPath("//*[@type='submit']"));
                 if (submitnode.Count > 0)
@@ -108,14 +130,18 @@ namespace Fb_InstaWpf
             {
 
             }
+			
             return false;
         }
 
         public bool TryPostImageToFBMessenger(PostMessage message)
         {
             var ChromeWebDriver = GetDriver();
-            //string url = "https://www.facebook.com/TP-1996120520653285/inbox/?selected_item_id=100002324267540";
-            //ChromeWebDriver.Navigate().GoToUrl(url);
+			string url = message.ToUrl;
+			ChromeWebDriver.Navigate().GoToUrl(url);	
+			OnlineFetcher.SetCookies(ChromeWebDriver);				
+            ChromeWebDriver.Navigate().GoToUrl(url);
+            
             ReadOnlyCollection<IWebElement> emailElement = ChromeWebDriver.FindElements(By.ClassName("_4dvy"));
             if (emailElement.Count > 0)
             {
@@ -138,27 +164,30 @@ namespace Fb_InstaWpf
             try
             {
                 var ChromeWebDriver = GetDriver();
+			 string url = message.ToUrl;			
+             ChromeWebDriver.Navigate().GoToUrl(url);
+			 OnlineFetcher.SetCookies(ChromeWebDriver);
+			 ChromeWebDriver.Navigate().GoToUrl(url);
+			   Thread.Sleep(4000);
                 ReadOnlyCollection<IWebElement> emailElement1 = ChromeWebDriver.FindElements(By.ClassName("UFICommentPhotoIcon"));
                 if (emailElement1.Count > 0)
                 {
                     emailElement1[0].Click();
-
                 }
-                Thread.Sleep(7000);
-
-                ReadOnlyCollection<IWebElement> sendimage = ChromeWebDriver.FindElements(By.XPath(".//span[@data-testid='ufi_photo_preview_test_id']"));
+                Thread.Sleep(15000);
+                ReadOnlyCollection<IWebElement> sendimage = ChromeWebDriver.FindElements(By.XPath(".//div[@class='notranslate _5rpu']"));
                 if (sendimage.Count > 0)
                 {
-                    Thread.Sleep(3000);
+					sendimage[0].Click();
+					Thread.Sleep(3000);
                     sendimage[0].SendKeys(Keys.Enter);
                     Thread.Sleep(3000);
                 }
             }
             catch (Exception)
             {
-
-                // ;
-            }
+			 
+            } 
             return false;
         }
 
@@ -167,8 +196,10 @@ namespace Fb_InstaWpf
         {
             var ChromeWebDriver = GetDriver();
 
-            // string url = "https://www.facebook.com/TP-1996120520653285/inbox/?selected_item_id=1996233970641940";
-            //    ChromeWebDriver.Navigate().GoToUrl(url);
+             string url = message.ToUrl;	
+			 ChromeWebDriver.Navigate().GoToUrl(url);				
+			 OnlineFetcher.SetCookies(ChromeWebDriver);				
+             ChromeWebDriver.Navigate().GoToUrl(url);
             Thread.Sleep(2000);
             ReadOnlyCollection<IWebElement> postcomment = ChromeWebDriver.FindElements(By.XPath("//*[@class='UFICommentContainer']"));
             if (postcomment.Count > 0)
@@ -178,8 +209,9 @@ namespace Fb_InstaWpf
                 if (postcomghghment.Count > 0)
                 {
                     postcomghghment[0].SendKeys(message.Message);
-                    Thread.Sleep(1000);
+                    Thread.Sleep(3000);
                     postcomghghment[0].SendKeys(OpenQA.Selenium.Keys.Enter);
+					return true;
                 }
 
             }
@@ -189,14 +221,17 @@ namespace Fb_InstaWpf
         public bool TryPostMessageToInsta(PostMessage message)
         {
             var ChromeWebDriver = GetDriver();
-            //string url = "https://www.facebook.com/TP-1996120520653285/inbox/?selected_item_id=1996142927317711";
-            //_chromeWebDriver.Navigate().GoToUrl(url);
+			string url = message.ToUrl;
+			ChromeWebDriver.Navigate().GoToUrl(url);
+			 OnlineFetcher.SetCookies(ChromeWebDriver);
+             ChromeWebDriver.Navigate().GoToUrl(url);
+           
             Thread.Sleep(3000);
             var emailElement = ChromeWebDriver.FindElements(By.XPath("//input[@class='_58al']"));
             if (emailElement.Count > 0)
             {
                 Thread.Sleep(3000);
-                emailElement[0].SendKeys("hiiii");
+                emailElement[0].SendKeys(message.Message);
             }
             Thread.Sleep(3000);
             var sendmessage = ChromeWebDriver.FindElements(By.XPath("//div[@class='_1fn8 _45dg']"));

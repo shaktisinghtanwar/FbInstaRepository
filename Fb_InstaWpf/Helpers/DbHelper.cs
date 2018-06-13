@@ -11,6 +11,7 @@ using System.Threading;
 using HtmlAgilityPack;
 using Fb_InstaWpf.DbModel;
 using Fb_InstaWpf.Enums;
+using Fb_InstaWpf.ViewModel;
 
 namespace Fb_InstaWpf
 {
@@ -26,6 +27,8 @@ namespace Fb_InstaWpf
         {
             return new SqLiteHelper();
         }
+
+		
         public void Add(PostMessage message)
         {
             //ObservableCollection<FbUserMessageInfo> messagingListInfo = new ObservableCollection<FbUserMessageInfo>();
@@ -59,8 +62,7 @@ namespace Fb_InstaWpf
             }
 
 
-        }
-     
+        }     
 
         public ObservableCollection<SocialUser> GetLoginUsers()
         {
@@ -325,7 +327,37 @@ namespace Fb_InstaWpf
             return messagingListInfo;
         }
 
-
+		public ObservableCollection<PostMessage> GetMessages()
+		{
+		ObservableCollection<PostMessage> jobsMessage = new ObservableCollection<PostMessage>();
+			try 
+			{
+			  var sql = GetSqliteHelper();
+			  var query="select ToUserId,MessageType,Status,ToUrl,Message,Id from Jobs Where Status='0' And FromUserId='"+OnlineFetcher.profilLoginId+"'";			
+			   var dt = sql.GetDataTable(query);			  
+              foreach (DataRow row in dt.Rows)
+              {
+                jobsMessage.Add(new PostMessage() {Id=Convert.ToInt32(row[5].ToString()), MessageTypeResponse = Convert.ToInt32(row[1].ToString()), Status = Convert.ToInt32(row[2].ToString()), ToUrl = row[3].ToString(),ToUserId = row[0].ToString(),Message =row[4].ToString() });
+				break;
+              }			
+			} catch(Exception) {
+			}
+			return jobsMessage;
+		
+		}		
+	
+	    public int UpdateMessageTable(int Id)
+		{
+		  int dt = 0;
+			try {
+			 var sql = GetSqliteHelper();
+			 var query="Update Jobs set Status = '1' Where Id='"+Id+"'";			
+			 dt = sql.ExecuteNonQuery(query);			 
+			}
+			catch(Exception ex) {			
+			}
+			return dt;
+		}
      
     }
 }
