@@ -16,6 +16,12 @@ namespace Fb_InstaWpf
         public App()
         {
             this.DispatcherUnhandledException += App_DispatcherUnhandledException;
+            this.Exit += App_Exit;
+        }
+
+        private void App_Exit(object sender, ExitEventArgs e)
+        {
+            OnlineFetcher.chromeWebDriver.Quit();
         }
 
         private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)

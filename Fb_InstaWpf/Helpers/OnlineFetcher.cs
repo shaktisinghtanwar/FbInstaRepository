@@ -21,6 +21,12 @@ namespace Fb_InstaWpf
         public ChromeDriver GetDriver()
         {
             var driver = new ChromeDriver();
+           
+            return driver;
+        }
+
+        public static void SetCookies(ChromeDriver driver)
+        {
             if (_cookieJar != null)
             {
                 foreach (var cookie in _cookieJar.AllCookies)
@@ -28,23 +34,19 @@ namespace Fb_InstaWpf
                     driver.Manage().Cookies.AddCookie(cookie); ;
                 }
             }
-            return driver;
         }
-       ChromeDriver chromeWebDriver { get; set; }
+        public static ChromeDriver chromeWebDriver { get; set; }
         ChromeOptions _options = new ChromeOptions();
-        public List<String> LstPageUrl = new List<string>();
-        private readonly Queue<string> _queueFbCmntImgUrl = new Queue<string>();
-        
-        DbHelper _dbHelper =new DbHelper();
-        private ICookieJar _cookieJar;
-        public bool isLoggedIn = false;
+      
+        private static ICookieJar _cookieJar;
         public void LoginWithSelenium(string userName ,string password)
          {
             try
             {
              FbPageInfo fbPageInfo=new FbPageInfo();
+                 
              string appStartupPath = System.IO.Path.GetDirectoryName(Assembly.GetCallingAssembly().Location );
-                const string url = "https://en-gb.facebook.com/login/";
+                const string url = "https://www.facebook.com/pages/?category=your_pages";
                 _options.AddArgument("--disable-notifications");
                 _options.AddArgument("--disable-extensions");
                 _options.AddArgument("--test-type");
@@ -86,9 +88,9 @@ namespace Fb_InstaWpf
                 {
                     signInElement[0].Click();
                     Thread.Sleep(3000);
-                    chromeWebDriver.Navigate().GoToUrl("https://www.facebook.com/pages/?category=your_pages");
+                  //  chromeWebDriver.Navigate().GoToUrl("https://www.facebook.com/pages/?category=your_pages");
                     // ChromeWebDriver.Navigate().GoToUrl(url);
-                    Thread.Sleep(2000);
+                   // Thread.Sleep(2000);
                     //ChromeWebDriver.Navigate().GoToUrl("https://www.facebook.com/TP-1996120520653285/inbox/?selected_item_id=100002948674558");
                     try
                     {
@@ -111,12 +113,18 @@ namespace Fb_InstaWpf
                     {
 
                     }
-                  
-                    Thread.Sleep(5000);
+                    finally
+                    {
+                        _cookieJar = chromeWebDriver.Manage().Cookies;
+
+                         // chromeWebDriver.Quit();
+
+                    }
+                    //Thread.Sleep(5000);
+
                     LoginSuccessEvent();
-                    _cookieJar = chromeWebDriver.Manage().Cookies;
-                    isLoggedIn = true;
-                    Thread.Sleep(2000);
+                   // isLoggedIn = true;
+                  //  Thread.Sleep(2000);
                 }
 
             }
@@ -130,7 +138,8 @@ namespace Fb_InstaWpf
         public void GetAllPaLoggedinUserPages(string userName)
         {
             var listFbPageInfo = new List<FbPageInfo>();
-           //var chromeWebDriver = GetDriver();
+            Queue<string> queueFbCmntImgUrl = new Queue<string>();
+            var chromeWebDriver = GetDriver();
             chromeWebDriver.Navigate().GoToUrl("https://www.facebook.com/pages/?category=your_pages");
             try
             {
@@ -142,9 +151,9 @@ namespace Fb_InstaWpf
                         var TemppageNodeItem = pageNodeItem.GetAttribute("href");
                         
                         //fbPageInfo.FbPageUrl = TemppageNodeItem;
-                        LstPageUrl.Add(TemppageNodeItem);
+                    //    LstPageUrl.Add(TemppageNodeItem);
 
-                        _queueFbCmntImgUrl.Enqueue(TemppageNodeItem);
+                        queueFbCmntImgUrl.Enqueue(TemppageNodeItem);
                     }
                     ArrayList arrlist1 = new ArrayList();
                     ArrayList arrlist2 = new ArrayList();
@@ -169,14 +178,16 @@ namespace Fb_InstaWpf
                             }
                            
                         }
-                    for (int i = 0; i < _queueFbCmntImgUrl.Count; i++)
+                    var dbHelper = new DbHelper();
+
+                    for (int i = 0; i < queueFbCmntImgUrl.Count; i++)
                     {
                         fbPageInfo.FbPageId= arrlist1[i].ToString();
                         fbPageInfo.FbPageName = arrlist2[i].ToString();
-                        fbPageInfo.FbPageUrl = _queueFbCmntImgUrl.Dequeue();
+                        fbPageInfo.FbPageUrl = queueFbCmntImgUrl.Dequeue();
                         listFbPageInfo.Add(fbPageInfo);
-                   //     _dbHelper.GetLoginUsers();
-                        _dbHelper.AddFacebookPage(fbPageInfo.FbPageId,fbPageInfo.FbPageName,fbPageInfo.FbPageUrl,userName);
+                        //     _dbHelper.GetLoginUsers();
+                        dbHelper.AddFacebookPage(fbPageInfo.FbPageId,fbPageInfo.FbPageName,fbPageInfo.FbPageUrl,userName);
                         
                     }
 
@@ -186,7 +197,10 @@ namespace Fb_InstaWpf
             {
 
             }
-
+            finally
+            {
+                chromeWebDriver.Quit();
+            }
         }
 
         public static void InsertFacebookCommentToDb(List<FbUserMessageInfo>  messagingFbpageListInfo)
@@ -212,16 +226,25 @@ namespace Fb_InstaWpf
         public void GetInstaMesages()
         {
             messagingFbpageListInfo = new List<FbUserMessageInfo>();
+            var chromeWebDriver = GetDriver();
             try
             {
                 Queue<string> queueInstaImgUrl = new Queue<string>();
 
-                //var chromeWebDriver = GetDriver();
+                
+                var dbHelper = new DbHelper();
                 Thread.Sleep(3000);
                 ListUsernameInfo listUsernameInfo = new ListUsernameInfo();
                 string url = "https://www.facebook.com/TP-1996120520653285/inbox/";
                 chromeWebDriver.Navigate().GoToUrl(url);
-                Thread.Sleep(3000);
+
+              //  url = "https://www.facebook.com/TP-1996120520653285/inbox/";
+
+                
+                SetCookies(chromeWebDriver);
+                chromeWebDriver.Navigate().GoToUrl(url);
+                Thread.Sleep(10000);
+              //  Thread.Sleep(3000);
 
                 ReadOnlyCollection<IWebElement> collection = chromeWebDriver.FindElements(By.ClassName("_32wr"));
                 {
@@ -268,7 +291,7 @@ namespace Fb_InstaWpf
                         listUsernameInfo.InboxNavigationUrl = currentURL;
 
                         var imgUrl = queueInstaImgUrl.Dequeue();
-                        _dbHelper.InsertInstagramMessage(userName, currentURL, imgUrl);
+                        dbHelper.InsertInstagramMessage(userName, currentURL, imgUrl);
 
 
 
@@ -306,13 +329,13 @@ namespace Fb_InstaWpf
                         }
 
 
-                        _dbHelper.InsertFacebookCommentToDb(messagingFbpageListInfo, profilIdtempinsta);
+                        dbHelper.InsertFacebookCommentToDb(messagingFbpageListInfo, profilIdtempinsta);
                     }
                 }
 
                 // var chromeWebDriver = GetDriver();
                 // chromeWebDriver.Navigate().GoToUrl(SelectedFBPageInfo.FBInboxNavigationUrl); navigationUrl
-                chromeWebDriver.Navigate().GoToUrl("https://www.facebook.com/TP-1996120520653285/inbox/?selected_item_id=1996142970651040");
+               // chromeWebDriver.Navigate().GoToUrl("https://www.facebook.com/TP-1996120520653285/inbox/?selected_item_id=1996142970651040");
 
                 
 
@@ -321,16 +344,24 @@ namespace Fb_InstaWpf
             {
 
             }
+            finally
+            {
+                chromeWebDriver.Quit();
+            }
         }
         public void GetFacebookMessages()
         {
             messagingFbpageListInfo = new List<FbUserMessageInfo>(); ;
+            var chromeWebDriver = GetDriver();
             try
             {
-
+               
+                DbHelper dbHelper = new DbHelper();
                 List<ListUsernameInfo> _MyListUsernameInfo = new List<ListUsernameInfo>();
                 Queue<string> myQueue = new Queue<string>();
                 string url = "https://www.facebook.com/TP-1996120520653285/inbox/";
+                chromeWebDriver.Navigate().GoToUrl(url);
+                SetCookies(chromeWebDriver);
                 chromeWebDriver.Navigate().GoToUrl(url);
                 Thread.Sleep(3000);
                 ReadOnlyCollection<IWebElement> LeftTabTempnode = chromeWebDriver.FindElements(By.ClassName("_32wr"));
@@ -380,7 +411,7 @@ namespace Fb_InstaWpf
                         listUsernameInfo.InboxNavigationUrl = currentURL;
                         _MyListUsernameInfo.Add(listUsernameInfo);
                         var imgUrl = myQueue.Dequeue();
-                        _dbHelper.InsertFbMessengerMessage(listUsernameInfo, userName, imgUrl);
+                        dbHelper.InsertFbMessengerMessage(listUsernameInfo, userName, imgUrl);
 
 
                         ///////////////
@@ -428,7 +459,7 @@ namespace Fb_InstaWpf
                                 messagingFbpageListInfo.Add(new FbUserMessageInfo { UserType = 2, otheruserFbimage = img, otheruserId = tempId });
                             }
                         }
-                        _dbHelper.InsertFacebookCommentToDb(messagingFbpageListInfo, profilIdtempFb);
+                        dbHelper.InsertFacebookCommentToDb(messagingFbpageListInfo, profilIdtempFb);
                         ///////////////
 
 
@@ -448,7 +479,10 @@ namespace Fb_InstaWpf
             {
 
             }
-            
+            finally
+            {
+                chromeWebDriver.Quit();
+            }
         }
 
         //GetFacebookMessages
@@ -458,7 +492,7 @@ namespace Fb_InstaWpf
 
         public void GetFbMessengerMessages()
         {
-
+            var chromeWebDriver = GetDriver();
             try
             {
                 List<ListUsernameInfo> _MyListUsernameInfo = new List<ListUsernameInfo>();
@@ -466,8 +500,9 @@ namespace Fb_InstaWpf
                 ListUsernameInfo listUsernameInfo = new ListUsernameInfo();
                 string url = "https://www.facebook.com/TP-1996120520653285/inbox/";
                 chromeWebDriver.Navigate().GoToUrl(url);
+                SetCookies(chromeWebDriver);
+                chromeWebDriver.Navigate().GoToUrl(url);
 
-               
                 ReadOnlyCollection<IWebElement> LeftTabTempnode = chromeWebDriver.FindElements(By.ClassName("_32wr"));
                 if (LeftTabTempnode.Count > 0)
                 {
@@ -498,7 +533,7 @@ namespace Fb_InstaWpf
                     }
                 }
                 var listNodeElements = htmlDocument.DocumentNode.SelectNodes("//div[@class='_4ik4 _4ik5']");
-
+                var dbHelper = new DbHelper();
                 ReadOnlyCollection<IWebElement> userlistnode = chromeWebDriver.FindElements(By.ClassName("_4k8x"));
                 if (userlistnode.Count > 0)
                 {
@@ -516,7 +551,8 @@ namespace Fb_InstaWpf
                         _MyListUsernameInfo.Add(listUsernameInfo);
                         var imgUrl = myQueue.Dequeue();
 
-                        _dbHelper.InsertFbMessengerMessage(listUsernameInfo, userName, imgUrl);
+                        
+                        dbHelper.InsertFbMessengerMessage(listUsernameInfo, userName, imgUrl);
 
 
                         Thread.Sleep(2000);
@@ -583,7 +619,7 @@ namespace Fb_InstaWpf
                                 string msgTimeng = match1.Value.Replace("data-tooltip-content=", "").Replace("data", "").Replace(@"""", "");
                                 messagingFbpageListInfo.Add(new FbUserMessageInfo { UserType = 0, loginguserimage = msgId, OtherUserDateTime = msgTimeng });
                             }
-                            _dbHelper.InsertFacebookCommentToDb(messagingFbpageListInfo, profilIdtempmsngr);
+                            dbHelper.InsertFacebookCommentToDb(messagingFbpageListInfo, profilIdtempmsngr);
                         }
 
 
@@ -592,9 +628,9 @@ namespace Fb_InstaWpf
                     }
                 }
 
-                chromeWebDriver.Navigate().GoToUrl("https://www.facebook.com/TP-1996120520653285/inbox/?selected_item_id=100002324267540");
+             //   chromeWebDriver.Navigate().GoToUrl("https://www.facebook.com/TP-1996120520653285/inbox/?selected_item_id=100002324267540");
                
-                Thread.Sleep(1000);
+             //   Thread.Sleep(1000);
 
                 //for (int i = 0; i < MessagingListInfo.Count; i++)
                 //{
@@ -622,7 +658,10 @@ namespace Fb_InstaWpf
 
 
             }
-
+            finally
+            {
+                chromeWebDriver.Quit();
+            }
         }
 
 

@@ -210,15 +210,9 @@ namespace Fb_InstaWpf.ViewModel
             if (!SelectedUsers.Any(m => m.InboxUserName.Equals(fbpageInboxUserInfo.InboxUserName)))
             {
                 SelectedUsers.Add(fbpageInboxUserInfo);
-                if (_onlineFetcher.isLoggedIn)
-                {
-                    ////For Messanger Message Method
-                }
-                else
-                {
-                    fbpageInboxUserInfo.Messages = _dbHelper.GetMessengerUserComments(fbpageInboxUserInfo.InboxUserId);
-                }
-               
+            
+               fbpageInboxUserInfo.Messages = _dbHelper.GetMessengerUserComments(fbpageInboxUserInfo.InboxUserId);
+             
             }
         }
     }

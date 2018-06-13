@@ -15,39 +15,39 @@ namespace Fb_InstaWpf
         {
             _producerConsumerCollection = new ConcurrentQueue<PostMessage>();
 
-            RestartThread();
+           // RestartThread();
         }
       //
-        public void ProcessMessage()
-        {
-            PostMessage message;
-            try
-            {
-                if (_producerConsumerCollection.TryPeek(out message))
-                {
-                    if (TryMessagePosting(message))
-                    {
-                        _producerConsumerCollection.TryDequeue(out message);
-                    }
-                }
-            }
-            catch (Exception)
-            {
-                //Log message
-            }
-            finally
-            {
-                RestartThread();
-            }
+        //public void ProcessMessage()
+        //{
+        //    PostMessage message;
+        //    try
+        //    {
+        //        if (_producerConsumerCollection.TryPeek(out message))
+        //        {
+        //            if (TryMessagePosting(message))
+        //            {
+        //                _producerConsumerCollection.TryDequeue(out message);
+        //            }
+        //        }
+        //    }
+        //    catch (Exception)
+        //    {
+        //        //Log message
+        //    }
+        //    finally
+        //    {
+        //        RestartThread();
+        //    }
 
-        }
+        //}
 
-        private void RestartThread()
-        {
-            System.Threading.Thread thread;
-            thread = new System.Threading.Thread(ProcessMessage);
-            thread.Start();
-        }
+        //private void RestartThread()
+        //{
+        //    System.Threading.Thread thread;
+        //    thread = new System.Threading.Thread(ProcessMessage);
+        //    thread.Start();
+        //}
 
         private  bool TryMessagePosting(PostMessage message)
         {
@@ -76,15 +76,18 @@ namespace Fb_InstaWpf
         {
             try
             {
-                 var ChromeWebDriver = GetDriver();
-                ChromeWebDriver.Navigate().GoToUrl("https://www.facebook.com/TP-1996120520653285/inbox/?selected_item_id=100002324267540");
+                 var chromeWebDriver = GetDriver();
+                chromeWebDriver.Navigate().GoToUrl("https://www.facebook.com/TP-1996120520653285/inbox/?selected_item_id=100002324267540");
                 Thread.Sleep(2000);
+                OnlineFetcher.SetCookies(chromeWebDriver);
+                chromeWebDriver.Navigate().GoToUrl("https://www.facebook.com/TP-1996120520653285/inbox/?selected_item_id=100002324267540");
+
                 //  ChromeWebDriver.Navigate().GoToUrl("https://www.facebook.com/pages/?category=your_pages");
-                string pageSource = ChromeWebDriver.PageSource;
+                string pageSource = chromeWebDriver.PageSource;
 
 
                 ReadOnlyCollection<IWebElement> writeNode =
-                       ChromeWebDriver.FindElements(By.XPath("//*[@placeholder='Write a reply...']"));
+                       chromeWebDriver.FindElements(By.XPath("//*[@placeholder='Write a reply...']"));
                 if (writeNode.Count > 0)
                 {
                     Thread.Sleep(2000);
@@ -93,7 +96,7 @@ namespace Fb_InstaWpf
                 }
 
                 ReadOnlyCollection<IWebElement> submitnode =
-                       ChromeWebDriver.FindElements(By.XPath("//*[@type='submit']"));
+                       chromeWebDriver.FindElements(By.XPath("//*[@type='submit']"));
                 if (submitnode.Count > 0)
                 {
                     Thread.Sleep(2000);
