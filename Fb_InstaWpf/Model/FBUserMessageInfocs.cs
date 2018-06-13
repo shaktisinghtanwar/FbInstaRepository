@@ -31,6 +31,7 @@ namespace Fb_InstaWpf.Model
     //create class for contains facebookPage Information
   public class FbPageInfo : BaseViewModel
     {
+      public string FbComboboxIndexId { get; set; }
         public string FbPageId { get; set; }
         public string FbPageName { get; set; }
         public string FbPageUrl { get; set; }

@@ -10,5 +10,10 @@
 
         public string ImagePath { get; set; }
         public string ToUserId { get; internal set; }
+        public int Status { get; set; }
+        public string ToUrl { get; set; }
+       
+
+        
     }
 }

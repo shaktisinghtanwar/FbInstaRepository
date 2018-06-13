@@ -36,6 +36,7 @@ namespace Fb_InstaWpf.ViewModel
         public DelegateCommand InstaInboxCommand { get; set; }
         public DelegateCommand ShowAllLeftSideData { get; set; }
 
+
         public DelegateCommand TabCtrlLoaded { get; set; }
         public DelegateCommand Tab2CtrlLoaded { get; set; }
         public DelegateCommand Tab0CtrlLoaded { get; set; }
@@ -69,7 +70,7 @@ namespace Fb_InstaWpf.ViewModel
                 }
             }
         }
-
+        public DelegateCommand NewLoginButtonLoaded { get; set; }
 
 
 
@@ -91,6 +92,7 @@ namespace Fb_InstaWpf.ViewModel
             set
             {
                 _messengerUserListViewModel = value;
+
                 OnPropertyChanged();
             }
         }
@@ -110,6 +112,7 @@ namespace Fb_InstaWpf.ViewModel
         public MainWindowViewModel()
         {
             LoginImageInfo = new ObservableCollection<ImageLoginTextbox>();
+           
             LoginCommand = new DelegateCommand(LoginCommandHandler, null);
             FetchAllLoggedinUserPages = new DelegateCommand(FetchAllLoggedinUserPagesCommandHandler, null);
             FbMessengerListCommand = new DelegateCommand(LeftFbMessengerListCommandHandler, null);
@@ -118,7 +121,7 @@ namespace Fb_InstaWpf.ViewModel
             ShowAllLeftSideData = new DelegateCommand(ShowAllLeftSideDataSelectionChangedCommandHandler);
             ImageProgressBarLoaded = new DelegateCommand(ImageProgressBarLoadedCommandHandler, null);
             CloseTabCommand = new DelegateCommand(CloseTab);
-
+            NewLoginButtonLoaded = new DelegateCommand(NewLoginButtonLoadedHandler);
             _databaseContext = new DatabaseContext();
             _onlineFetcher = new OnlineFetcher();
             _onlinePoster = new OnlinePoster();
@@ -128,11 +131,21 @@ namespace Fb_InstaWpf.ViewModel
             Task.Factory.StartNew(() => FillPageList());
 
         }
+        public static System.Windows.Controls.Button Button { get; set; }
+        private void NewLoginButtonLoadedHandler(object obj)
+        {
+            Button = obj as System.Windows.Controls.Button;
+            //Button.IsEnabled = false;
+        }
 
         private void ShowAllLeftSideDataSelectionChangedCommandHandler(object obj)
         {
+             dataId=obj as System.Windows.Controls.ComboBox;
+            FbPageInfo.FbComboboxIndexId = dataId.SelectedValue.ToString();
             //System.Windows.MessageBox.Show("Combobox2");
-            FatchLeftMessengerData(obj);
+            
+            FetchLeftMessengerData(dataId.SelectedIndex);
+            
 
         }
 
@@ -147,9 +160,20 @@ namespace Fb_InstaWpf.ViewModel
           //  _onlineFetcher.GetFacebookMessages();
             //_onlineFetcher.GetFbMessengerMessages();
             //  _onlineFetcher.GetInstaMesages();
-            _onlineFetcherFacebookMessengerTask = Task.Factory.StartNew(() => _onlineFetcher.GetFbMessengerMessages());
-            _onlineFetcherGetAllPagesTask = Task.Factory.StartNew(() => _onlineFetcher.GetFacebookMessages());
-            _onlineFetcherInstagramMessagesTask = Task.Factory.StartNew(() => _onlineFetcher.GetInstaMesages());
+         
+            string pageUrl = null;
+            if (FbPageInfo == null)
+            {
+                pageUrl = PageList.FirstOrDefault().FbPageUrl;
+            }
+            else
+            {
+                pageUrl = FbPageInfo.FbPageUrl;
+                
+            }
+            _onlineFetcherFacebookMessengerTask = Task.Factory.StartNew(() => _onlineFetcher.GetFbMessengerMessages(pageUrl));
+            _onlineFetcherGetAllPagesTask = Task.Factory.StartNew(() => _onlineFetcher.GetFacebookMessages(pageUrl));
+            _onlineFetcherInstagramMessagesTask = Task.Factory.StartNew(() => _onlineFetcher.GetInstaMesages(pageUrl));
 
             //_onlinePosterTask = Task.Factory.StartNew(() => _onlinePoster.ProcessMessage());
         }
@@ -181,11 +205,13 @@ namespace Fb_InstaWpf.ViewModel
             //FatchLeftMessengerData(obj);
         }
 
-        private void FatchLeftMessengerData(object obj)
+
+        private void FetchLeftMessengerData(int index)
         {
             
-            if (MessengerUserListViewModel == null)
+            //if (MessengerUserListViewModel == null)
                 Task.Factory.StartNew(() => LeftMessengerData());
+                TabControlSelectedIndex = index;
         }
 
         private void LeftFbPageInboxCommandHandler(object obj)
@@ -200,32 +226,35 @@ namespace Fb_InstaWpf.ViewModel
             Task.Factory.StartNew(() => LeftInstagramData());
         }
 
+        public SocialUser _socialUser;
         private void LeftMessengerData()
         {
 
-            if (MessengerUserListViewModel != null) return;
-            var data = _dbHelper.GetLeftMessengerListData(LoginUser.InboxUserId, TabType.Messenger, FbPageInfo.FbPageId);
-
+            //if (MessengerUserListViewModel != null) return;
+            var data = _dbHelper.GetLeftMessengerListData(LoginUser.InboxUserId, TabType.Messenger, FbPageInfo.FbComboboxIndexId);
             Application.Current.Dispatcher.Invoke(() =>
             {
-                MessengerUserListViewModel = MessengerUserListViewModel ?? new SocialTabViewModel(Enums.TabType.Messenger,LoginUser)
+                MessengerUserListViewModel =  new SocialTabViewModel(Enums.TabType.Messenger, LoginUser)
                 {
                     UserListInfo = data
                 };
                 if (MessengerUserListViewModel.SelectedItem == null)
                     MessengerUserListViewModel.SelectedItem = data.FirstOrDefault();
+
             });
+
         }
 
         private void LeftFacebookData()
         {
-            if (FacebookUserListViewModel != null) return;
+            
+       //     if (FacebookUserListViewModel != null) return;
 
-            var data = _dbHelper.GetLeftMessengerListData(LoginUser.InboxUserId, TabType.Facebook, FbPageInfo.FbPageId);
+            var data = _dbHelper.GetLeftMessengerListData(LoginUser.InboxUserId, TabType.Facebook, FbPageInfo.FbComboboxIndexId);
            // var data = _dbHelper.GetFacebookListData(LoginUser.UserId);
             Application.Current.Dispatcher.Invoke(() =>
             {
-                FacebookUserListViewModel = FacebookUserListViewModel ?? new SocialTabViewModel(Enums.TabType.Facebook,LoginUser)
+                FacebookUserListViewModel = new SocialTabViewModel(Enums.TabType.Facebook,LoginUser)
                 {
                     UserListInfo = data
                 };
@@ -236,13 +265,13 @@ namespace Fb_InstaWpf.ViewModel
 
         private void LeftInstagramData()
         {
-            if (InstagramUserListViewModel != null) return;
+          //  if (InstagramUserListViewModel != null) return;
 
             //var data = _dbHelper.GetInstaUserList(LoginUser.UserId);
-            var data = _dbHelper.GetLeftMessengerListData(LoginUser.InboxUserId, TabType.Instagram, FbPageInfo.FbPageId);
+            var data = _dbHelper.GetLeftMessengerListData(LoginUser.InboxUserId, TabType.Instagram, FbPageInfo.FbComboboxIndexId);
             Application.Current.Dispatcher.Invoke(() =>
             {
-                InstagramUserListViewModel = InstagramUserListViewModel ?? new SocialTabViewModel(Enums.TabType.Instagram,LoginUser)
+                InstagramUserListViewModel =  new SocialTabViewModel(Enums.TabType.Instagram,LoginUser)
                 {
                     UserListInfo = data
                 };
@@ -352,6 +381,7 @@ namespace Fb_InstaWpf.ViewModel
 
         private void LoginCommandHandler(object obj)
         {
+            Button.IsEnabled = false;
             _onlineFetcher.LoginWithSelenium(LoginUser.InboxUserName,LoginUser.Password);
        }
 
@@ -398,5 +428,7 @@ namespace Fb_InstaWpf.ViewModel
         }
 
         public string pageId { get; set; }
+
+        public System.Windows.Controls.ComboBox dataId { get; set; }
     }
 }

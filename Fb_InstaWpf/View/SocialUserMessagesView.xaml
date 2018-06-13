@@ -14,11 +14,11 @@
         </Grid.RowDefinitions>
         <Grid>
             <!--Rishab Tab Messenger-->
-            <TabControl ItemsSource="{Binding SelectedUsers, Mode=TwoWay}">
+            <TabControl ItemsSource="{Binding SelectedUsers, Mode=TwoWay}" >
                 <TabControl.ItemTemplate>
                     <DataTemplate DataType="model:UserMsgTabItem">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding InboxUserName}"/>
+                            <TextBlock Text="{Binding InboxUserName}" />
                             <Button Command="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.CloseTabCommand}">
                                 <Button.CommandParameter>
                                     <MultiBinding Converter="{StaticResource AddValuesWithHyhpen}">
@@ -35,7 +35,7 @@
 
                 <TabControl.ContentTemplate>
                     <DataTemplate DataType="model:UserMsgTabItem">
-                        <ListBox ItemTemplateSelector="{StaticResource MessageDataTemplateSelector}" HorizontalAlignment="Left" 
+                        <ListBox ItemTemplateSelector="{StaticResource MessageDataTemplateSelector}" Visibility="Visible" HorizontalAlignment="Left" 
                                                          ItemsSource="{Binding Messages}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" >
                             <ListBox.ItemContainerStyle>
                                 <Style TargetType="ListBoxItem">

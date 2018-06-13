@@ -153,7 +153,7 @@ namespace Fb_InstaWpf.ViewModel
                 FromUserId = LoginUser.UserId,
                 ToUserId = ActiveTabUser.InboxUserId,
                 MessageType = MessageType.FacebookMessengerImage,
-                ImagePath = fileName,
+                ImagePath = fileName
             };
             _dbHelper.Add(message);
         }
@@ -166,20 +166,39 @@ namespace Fb_InstaWpf.ViewModel
                 ToUserId = ActiveTabUser.InboxUserId,
                 ImagePath = MessageToSend,
                 MessageType = MessageType.InstaMessage
+                 
             });
             MessageToSend = string.Empty;
         }
 
+    
+
         public void SendMessageCommandHandler(object message)
         {
 
+            
+            try
+            {
 
-
-
-            _dbHelper.Add(new PostMessage() { FromUserId = LoginUser.InboxUserId, ToUserId = SelectedItem.InboxUserId, Message = MessageToSend, MessageType = MessageType.FacebookMessage, ImagePath = null });
-            MessageBox.Show("Message save successfully");
-           _selectedUserInfo.Messages.Add(new FbUserMessageInfo { UserType = 0, Message =MessageToSend});
-           MessageToSend = "";
+                _dbHelper.Add(new PostMessage()
+                {
+                    FromUserId = LoginUser.InboxUserId,
+                    ToUserId = SelectedItem.InboxUserId,
+                    Message = MessageToSend,
+                    MessageType = MessageType.FacebookMessage,
+                    ImagePath = null,
+                    Status = 0,
+                    ToUrl = SelectedItem.InboxNavigationUrl
+                });
+                MessageBox.Show("Message save successfully");
+                _selectedUserInfo.Messages.Add(new FbUserMessageInfo { UserType = 0, Message = MessageToSend });
+                MessageToSend = "";
+            }
+            catch (Exception)
+            {
+                    
+                throw;
+            }
 
         }
         private void SendimageFBCommandHandler(object obj)

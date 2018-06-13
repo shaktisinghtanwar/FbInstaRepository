@@ -33,6 +33,12 @@ namespace Fb_InstaWpf
             TabRightItemInsta.Visibility = Visibility.Hidden;
             TabRightItemFacebook.Visibility = Visibility.Hidden;
             TabRightItemMessenger.IsSelected = true;
+            TabRightItemMessenger.GotFocus += TabRightItemMessenger_GotFocus;
+        }
+
+        void TabRightItemMessenger_GotFocus(object sender, RoutedEventArgs e)
+        {
+            TabRightItemMessenger.IsSelected = true;
         }
 
         private void TabLeftFacebookItem_GotFocus(object sender, RoutedEventArgs e)
@@ -41,6 +47,12 @@ namespace Fb_InstaWpf
             TabRightItemInsta.Visibility = Visibility.Hidden;
             TabRightItemFacebook.Visibility = Visibility.Visible;
             TabRightItemFacebook.IsSelected = true;
+            
+        }
+
+        private void TabRightFacebookItem_GotFocus(object sender, RoutedEventArgs e)
+        {
+            
         }
 
         private void TabLeftItemInsta_GotFocus(object sender, RoutedEventArgs e)

@@ -14,6 +14,7 @@ namespace Fb_InstaWpf.Model
         private string _inboxNavigationUrl;
         private string _messageUserType;
         private string _password;
+       
         DbHelper _dbHelper;
         private ObservableCollection<FbUserMessageInfo> _messages;
         private string _userId;

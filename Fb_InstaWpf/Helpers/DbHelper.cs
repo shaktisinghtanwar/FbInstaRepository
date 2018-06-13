@@ -30,13 +30,10 @@ namespace Fb_InstaWpf
         {
             //ObservableCollection<FbUserMessageInfo> messagingListInfo = new ObservableCollection<FbUserMessageInfo>();
             var sql = GetSqliteHelper();
-            string query = "INSERT INTO Jobs(FromUserId,ToUserId, Message,ImagePath,MessageType,PlateformType) values('" + message.FromUserId + "','" + message.ToUserId + "','" + message.Message + "','" + message.ImagePath + "','" + (int)message.MessageType + "','" + "1" + "')";
+            string query = "INSERT INTO Jobs(FromUserId,ToUserId, Message,ImagePath,MessageType,PlateformType,Status,ToUrl) values('" + message.FromUserId + "','" + message.ToUserId + "','" + message.Message + "','" + message.ImagePath + "','" + (int)message.MessageType + "','" + "1" + "','0','" + message.ToUrl + "')";
             int yy = sql.ExecuteNonQuery(query);
-
-            
-
-
         }
+
         public void AddLoginUser(SocialUser loginUser)
         {
             var sql = GetSqliteHelper();
@@ -58,9 +55,7 @@ namespace Fb_InstaWpf
                 int yy = sql.ExecuteNonQuery(query);
             }
 
-
         }
-     
 
         public ObservableCollection<SocialUser> GetLoginUsers()
         {
@@ -77,12 +72,14 @@ namespace Fb_InstaWpf
             }
             return users;
         }
+
         public void InsertFacebookMessage(ListUsernameInfo listUsernameInfo, string userName, string currentURL, string imgUrl)
         {
             var sql = GetSqliteHelper();
             string query = "INSERT INTO TblFbComment(Fbcomment_InboxUserId, Fbcomment_InboxUserName,Fbcomment_InboxUserImage,FBInboxNavigationUrl,Status) values('" + listUsernameInfo.ListUserId + "','" + userName + "','" + imgUrl + "','" + currentURL + "','" + false + "')";
             int yy = sql.ExecuteNonQuery(query);
         }
+
 
         public  ObservableCollection<FbPageInfo> GetFacebookPage()
         {
@@ -112,7 +109,7 @@ namespace Fb_InstaWpf
             int yy = sql.ExecuteNonQuery(query);
         }
 
-        public void InsertFbMessengerMessage( ListUsernameInfo listUsernameInfo, string userName, string imgUrl)
+        public void InsertFbMessengerMessage(ListUsernameInfo listUsernameInfo, string userName, string imgUrl, string profilIdtempFb)
         {
             try
             {
@@ -127,7 +124,7 @@ namespace Fb_InstaWpf
                     string query =
                         "INSERT INTO FacebookUsers(FacebookId,DisplayName,ImageUrl,NavigationUrl,JobType,Parent_User_Id) values('" +
                         listUsernameInfo.ListUserId + "','" + userName + "','" + imgUrl + "','" +
-                        listUsernameInfo.InboxNavigationUrl + "','1','100012494199316')";
+                        listUsernameInfo.InboxNavigationUrl + "','1','" + profilIdtempFb + "')";
 
                     
                     int yy = sql.ExecuteNonQuery(query);
